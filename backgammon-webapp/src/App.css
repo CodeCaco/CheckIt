@@ -30,3 +30,7 @@
   color: #fff;
   font-size: 100px;
 }
+
+.triangleTest {
+  display: flex;
+}

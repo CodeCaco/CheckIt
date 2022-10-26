@@ -1,0 +1,20 @@
+.tri {
+    width: 75px;
+    height: 150px;
+}
+
+.tri--up {
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.tri--down {
+    clip-path: polygon(100% 0%, 0% 0%, 50% 100%);
+}
+
+.tri--one {
+    background-color: turquoise;
+}
+
+.tri--two {
+    background-color: cyan;
+}
