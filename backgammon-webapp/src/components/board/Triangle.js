@@ -1,18 +1,20 @@
 import React from 'react';
 import './Triangle.css';
 
-const STYLES = ['tri--one', 'tri--two'];
+const STYLES = ['p1-color', 'p2-color'];
 
 const ORIENTATION = ['tri--up', 'tri--down'];
 
-export const Triangle = ({triangleStyle, triangleOrientation}) => {
-    const checkTriangleStyle = STYLES.includes(triangleStyle) ? triangleStyle : STYLES[0]
+export const Triangle = (props) => {
+    const checkTriangleStyle = STYLES.includes(props.color) ? props.color : STYLES[0]
 
-    const checkTriangleOrientation = ORIENTATION.includes(triangleOrientation) ? triangleOrientation : ORIENTATION[0]
+    const checkTriangleOrientation = ORIENTATION.includes(props.orientation) ? props.orientation : ORIENTATION[0]
 
     return (
         <>
-            <div className={`tri ${checkTriangleStyle} ${checkTriangleOrientation}`}></div>
+            <div className="tri-column">
+                <div className={`tri ${checkTriangleStyle} ${checkTriangleOrientation}`}></div>
+            </div>
         </>
     )
 };

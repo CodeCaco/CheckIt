@@ -1,0 +1,70 @@
+.board {
+    height: 75vh;
+    width: 100%;
+    background-color: rgba(156, 156, 156, 0.62);
+    padding-right: 15px;
+    padding-left: 15px;
+    margin: auto;
+    position: relative;
+}
+
+.outside-column {
+    display: block;
+    position: absolute;
+    width: 6%;
+    bottom: 5%;
+    top: 5%;
+}
+
+.left {
+    left: 5%;
+}
+
+.right {
+    right: 5%;
+}
+
+.board-left {
+    background-image: url("../../assets/cloth.jpeg");
+    border-image: url('../../assets/leather.jpeg') 10% 30%/ 15px 15px / 15px;
+    display: block;
+    position: absolute;
+    top: 5%;
+    left: 15%;
+    bottom: 5%;
+    width: 30%;
+}
+
+.board-right {
+    background-image: url("../../assets/cloth.jpeg");
+    border-image: url('../../assets/leather.jpeg') 10% 30%/ 15px 15px / 15px;
+    display: block;
+    position: absolute;
+    top: 5%;
+    right: 15%;
+    bottom: 5%;
+    width: 30%;
+}
+
+.region-up {
+    position: absolute;
+    top: 0;
+    height: 45%;
+    width: 100%;
+    display: flex;
+}
+
+.region-down {
+    position: absolute;
+    bottom: 0;
+    height: 45%;
+    width: 100%;
+    display: flex;
+}
+
+.region-middle {
+    position: absolute;
+    top: 45%;
+    height: 10%;
+    width: 100%;
+}
