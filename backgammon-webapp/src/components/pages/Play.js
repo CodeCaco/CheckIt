@@ -5,7 +5,9 @@ import Board from '../board/Board';
 function Play() {
   return (
     <>
-      <Board />
+      <div className="playground">
+        <Board />
+      </div>
     </>
   )
 }

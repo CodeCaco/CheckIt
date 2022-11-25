@@ -14,6 +14,9 @@ export const Triangle = (props) => {
         <>
             <div className="tri-column">
                 <div className={`tri ${checkTriangleStyle} ${checkTriangleOrientation}`}></div>
+                <div className='checkers-column'>
+                    {props.children}
+                </div>
             </div>
         </>
     )
