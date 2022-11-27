@@ -1,0 +1,9 @@
+.outside-btn {
+    outline: none;
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+    width: 75%;
+    height: 45%;
+    border-radius: 10%;
+}

@@ -1,0 +1,125 @@
+.btn-dice { 
+    background-color:  rgb(255, 255, 255);  
+    width: 100%;  
+    height: 100%;  
+    border-radius: 10%;
+    display: flex;
+}
+
+.btn-dice .clickable {
+    cursor: pointer;
+}
+
+.clickable:hover {
+    background-color: rgb(201, 201, 201);
+}
+
+.btn-dot {
+    position: relative;
+    display: block;
+    width: 23%;
+    height: 23%;
+    border-radius: 50%;
+    background-color:rgb(0, 0, 0);
+    margin: 5px;
+}
+
+.one {
+    justify-content: center;
+    align-items: center;
+}
+
+.one .btn-dot {
+    align-self: center;
+}
+
+.two {
+    justify-content: space-between;
+}
+
+.two .btn-dot:nth-of-type(2) {
+    align-self: flex-end;
+}
+
+.three {
+    justify-content: space-between;
+}
+
+.three .btn-dot:nth-of-type(2) {
+    align-self: center;
+}
+
+.three .btn-dot:nth-of-type(3) {
+    align-self: flex-end;
+}
+
+.four {
+    display: flex;
+}
+
+.four .btn-dot {
+    width: 30%;
+    height: 15%;
+    scale: 130%;
+}
+
+.four .dice-column {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.four .dice-column:nth-of-type(2) {
+    align-items: flex-end;
+}
+
+.five {
+    display: flex;
+}
+
+.five .btn-dot {
+    width: 35%;
+    height: 15%;
+    scale: 165%;
+}
+
+.five .dice-column {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.five .dice-column:nth-of-type(2) {
+    justify-content: center;
+    align-items: center;
+}
+
+.five .dice-column:nth-of-type(3) {
+    align-items: flex-end;
+}
+
+.six {
+    display: flex;
+}
+
+.six .btn-dot {
+    width: 30%;
+    height: 15%;
+    scale: 130%;
+}
+
+.six .dice-column {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.six .dice-column:nth-of-type(2) {
+    align-items: flex-end;
+}
