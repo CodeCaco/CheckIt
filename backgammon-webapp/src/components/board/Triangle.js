@@ -10,11 +10,13 @@ export const Triangle = (props) => {
 
     const checkTriangleOrientation = ORIENTATION.includes(props.orientation) ? props.orientation : ORIENTATION[0]
 
+    const clickable = props.clickable === "click" ? props.clickable : ""
+
     return (
         <>
             <div className="tri-column">
                 <div className={`tri ${checkTriangleStyle} ${checkTriangleOrientation}`}></div>
-                <div className='checkers-column'>
+                <div className={`checkers-column ${clickable}`}>
                     {props.children}
                 </div>
             </div>

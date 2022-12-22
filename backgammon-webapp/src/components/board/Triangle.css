@@ -4,9 +4,18 @@
 }
 
 .checkers-column {
-    position: absolute;
-    width: 16.6%;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
     height: 100%;
+}
+
+.region-down .checkers-column {
+    flex-direction: column-reverse;
+}
+
+.click {
+    cursor: pointer;
 }
 
 .tri--up {
@@ -40,4 +49,8 @@
 
 .p2-color{
     --color: rgb(175, 23, 43);
+}
+
+.receivable {
+    --color: rgba(0, 128, 0, 0.70);
 }

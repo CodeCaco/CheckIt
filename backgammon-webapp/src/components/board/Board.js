@@ -28,7 +28,12 @@ const Board = (props) => {
                 offset = (scrollHeight - divHeight) / (columnCheckers.length - 1);
             if (columnCheckers.length > 4) {
                 for (var j = 1; j < columnCheckers.length; j++) {
-                    columnCheckers[j].style.transform = "translateY(-" + offset * j + "px)";
+                    if (checkerColumn[i].parentNode.children[0].className.includes("tri--up")){
+                      columnCheckers[j].style.transform = "translateY(+" + offset * j + "px)";
+                      columnCheckers[j].style.zIndex = columnCheckers.length + j
+                    } else {
+                      columnCheckers[j].style.transform = "translateY(-" + offset * j + "px)";
+                    }
                 }
             }
         } 
@@ -63,9 +68,9 @@ const Board = (props) => {
         <div className="region-up">
             {[1, 0, 1, 0, 1, 0].map(a => {
               if (a === 1) {
-                return <Triangle orientation='tri--down'>{handleCheckers(1, 10)}</Triangle>
+                return <Triangle orientation='tri--down'></Triangle>
               } else {
-                return <Triangle color='p2-color' orientation='tri--down'>{handleCheckers(2, 3)}</Triangle>
+                return <Triangle color='p2-color' orientation='tri--down'></Triangle>
               }}
             )}
         </div>
@@ -73,10 +78,13 @@ const Board = (props) => {
               {middleLeftDice}
         </div>
         <div className="region-down">
-          {[0, 1, 0, 1, 0, 1].map(a => {
+          {[0, 1, 2, 1, 2, 1].map(a => {
               if (a === 1) {
                 return <Triangle />
               } else {
+                if (a === 0) {
+                  return <Triangle color='p2-color'>{handleCheckers(1, 10)}</Triangle>
+              }
                 return <Triangle color='p2-color'/>
               }}
           )}
@@ -84,10 +92,13 @@ const Board = (props) => {
       </div>
       <div className="board-right">
         <div className="region-up">
-          {[1, 0, 1, 0, 1, 0].map(a => {
+          {[1, 2, 1, 2, 1, 0].map(a => {
               if (a === 1) {
                 return <Triangle orientation='tri--down'/>
               } else {
+                if (a === 0) {
+                  return <Triangle color='p2-color' orientation='tri--down'>{handleCheckers(2, 10)}</Triangle>
+                }
                 return <Triangle color='p2-color' orientation='tri--down'/>
               }}
             )}
@@ -100,7 +111,7 @@ const Board = (props) => {
               if (a === 1) {
                 return <Triangle />
               } else {
-                return <Triangle color='p2-color'/>
+                return <Triangle color='p2-color'>{handleCheckers(1, 4)}</Triangle>
               }}
           )}
         </div>
