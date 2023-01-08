@@ -1,7 +1,7 @@
 import React from 'react';
 import './Triangle.css';
 
-const STYLES = ['p1-color', 'p2-color'];
+const STYLES = ['p1-color', 'p2-color', 'receivable'];
 
 const ORIENTATION = ['tri--up', 'tri--down'];
 
@@ -10,13 +10,13 @@ export const Triangle = (props) => {
 
     const checkTriangleOrientation = ORIENTATION.includes(props.orientation) ? props.orientation : ORIENTATION[0]
 
-    const clickable = props.clickable === "click" ? props.clickable : ""
+    const clickable = props.clickable === " click" ? props.clickable : ""
 
     return (
         <>
             <div className="tri-column">
                 <div className={`tri ${checkTriangleStyle} ${checkTriangleOrientation}`}></div>
-                <div className={`checkers-column ${clickable}`}>
+                <div className={`checkers-column${clickable}`}>
                     {props.children}
                 </div>
             </div>
