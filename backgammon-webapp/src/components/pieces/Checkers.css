@@ -8,6 +8,8 @@
     margin: 0px auto;
     border-radius: 50%;
     pointer-events: none;
+    flex: 0 0 20%;
+    z-index: 11;
   }
 
   .checker-red {
