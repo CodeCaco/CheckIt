@@ -7,25 +7,34 @@ class Play extends Component {
     dice: [],
     player1: true,
     start: true,
+    p1FirstChecker: 12,
+    p2FirstChecker: 11,
     moving: false,
     pips: Array(24).fill({player: null, checkers: 0})
   }
 
+  // function responsible for handling the roll of the dice
   calculateRoll = () => {
     let dice = [];
 
+    // finds 2 random numbers between 1-6 and adds them to dice => simulating roll of 2 dices
     for (let i = 0; i < 2; i++) {
       dice.push(Math.floor(Math.random() * 6) +1)
     }
+
+    // if both die rolls are the same, then double it (FEVGA rule)
     if (dice[0] === dice[1]) {
       for (let i = 0; i < 2; i++) {
         dice.push(dice[0])
       }
     }
-    
+
     dice.sort((a, b) => b - a)
     let pips = this.cleanPips(this.state.pips)
-    const moves = this.findMoves(pips, dice)
+
+    // find the available moves after the roll of the dice
+    const firstCheckerIndex = this.state.player1 ? this.state.p1FirstChecker : this.state.p2FirstChecker
+    const moves = this.findMoves(pips, dice, firstCheckerIndex)
 
     this.setState({
       dice: dice,
@@ -33,17 +42,34 @@ class Play extends Component {
     })
   }
 
-  findMoves = (pips, dice) => {
+  // function that handles the highlighting of all checkers that are allows to move
+  findMoves = (pips, dice, firstCheckerIndex) => {
     let pipPath = []
     let playerPips = []
 
-    // specify the pip path each player follows
+    // for both players specify it's path and which pips have checkers that are allowed to move
     if (this.state.player1) {
+      // this array is responsible for the pip path each player follows
       pipPath = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
-      playerPips = pips.filter(pip => pip.player === 1)
+
+      // if the first checker still hasn't moved from starting table, only find the pip of that first checker
+      if (firstCheckerIndex !== false) {
+        playerPips = pips.filter((p, i) => i === firstCheckerIndex)
+      } else {
+        // find all the pips that have p1 checkers
+        playerPips = pips.filter(pip => pip.player === 1)
+      }
     } else {
+      // this array is responsible for the pip path each player follows
       pipPath = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
-      playerPips = pips.filter(pip => pip.player === 2)
+
+      // if the first checker still hasn't moved from starting table, only find the pip of that first checker
+      if (firstCheckerIndex !== false) {
+        playerPips = pips.filter((p, i) => i === firstCheckerIndex)
+      } else {
+        // find all the pips that have p1 checkers
+        playerPips = pips.filter(pip => pip.player === 2)
+      }
     }
 
     let newPips = this.cleanPips(pips)
@@ -70,14 +96,15 @@ class Play extends Component {
       })
 
       if (numberOfPossibleDestinations > 0) {
-        newPips[originIndex].movable = this.checkerClick.bind(this, originIndex, pipPath)
+        newPips[originIndex].movable = this.checkerClick.bind(this, originIndex, pipPath, firstCheckerIndex)
       }
     });
 
     return {pips: newPips}
   }
 
-  checkerClick = (originIndex, pipPath) => {
+  // function responsible for performing the necessary steps when a user clicks on an available checker to move
+  checkerClick = (originIndex, pipPath, firstCheckerIndex) => {
     let dice = this.state.dice
 
     // remove all the highlights from the board
@@ -88,8 +115,8 @@ class Play extends Component {
   
     if (checker !== false) {
       // highlight the checker that's moving
-      pips[checker].movable = this.checkerClick.bind(this, checker)
-
+      pips[checker].movable = this.checkerClick.bind(this, checker, pipPath, firstCheckerIndex)
+      
       let possibleDestinations = []
       const pathOriginIndex = pipPath.findIndex(pip => pip === originIndex)
 
@@ -111,7 +138,8 @@ class Play extends Component {
         pips[pip.index].receivable = this.receiverClick.bind(this, pip.index, pip.die)
       })
     } else {
-      const moves = this.findMoves(pips, this.state.dice);
+      // if checker is unset then find and highlight all the checkers available to move again
+      const moves = this.findMoves(pips, this.state.dice, firstCheckerIndex);
       pips = moves.pips;
     }
     
@@ -121,26 +149,58 @@ class Play extends Component {
     })
   }
 
+  // function responsible for performing the necessary steps when a user clicks on a destination pip to move a checker to it
   receiverClick = (index, die) => {
+    let firstCheckerIndex = false
+
+    // update the state of the first checker depending on whether or not it crossed to the opposing table
+    if (this.state.player1) {
+      firstCheckerIndex = this.state.p1FirstChecker
+      if (firstCheckerIndex !== false) {
+        if (index < 18) {
+          firstCheckerIndex = index
+        } else {
+          firstCheckerIndex = false
+        }
+      }
+    } else {
+      firstCheckerIndex = this.state.p2FirstChecker
+      if (firstCheckerIndex !== false) {
+        if (index > 5) {
+          firstCheckerIndex = index
+        } else {
+          firstCheckerIndex = false
+        }
+      }
+    }
+
     let pips = this.cleanPips(this.state.pips)
     let moving = this.state.moving
 
+    // remove checker from the origin pip
     pips[moving].checkers--
+
+    // if the origin pip is empty after removal, make it non player occupied
     if (pips[moving].checkers === 0) {
       pips[moving].player = null
     }
+    
+    // update moving checker to null to notify that no checker is moving 
     moving = null
 
+    // add a checker to the destination pip & update the pip's player occupation to that of the checker owner
     pips[index].checkers++
     let player = this.state.player1 ? 1 : 2
     pips[index].player = player
 
+    // after move is done, remove the die responsible for said move
     let dice = this.state.dice
     const dieIndex = dice.findIndex(d => d === die)
     dice.splice(dieIndex, 1)
 
+    // check if player still has moves left to perform, if not switch players
     if (dice.length !== 0) {
-      const moves = this.findMoves(pips, dice);
+      const moves = this.findMoves(pips, dice, firstCheckerIndex);
       pips = moves.pips;
       player = this.state.player1
     } else {
@@ -153,8 +213,18 @@ class Play extends Component {
       player1: player,
       moving: moving
     })
+    if (this.state.player1) {
+      this.setState({
+        p1FirstChecker: firstCheckerIndex
+      })
+    } else {
+      this.setState({
+        p2FirstChecker: firstCheckerIndex
+      })
+      }
   }
 
+  // function responsible to give a new pip array without movable or receivable functions
   cleanPips = (pips) => {
     let newPips = pips.map((pip) => {
       return {player: pip.player, checkers: pip.checkers}
