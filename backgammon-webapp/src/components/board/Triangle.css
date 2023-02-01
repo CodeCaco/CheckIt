@@ -18,6 +18,10 @@
     cursor: pointer;
 }
 
+.receivable {
+    cursor: pointer;
+}
+
 .tri--up {
     position: absolute;
     width: 16.6%;

@@ -10,13 +10,17 @@ export const Triangle = (props) => {
 
     const checkTriangleOrientation = ORIENTATION.includes(props.orientation) ? props.orientation : ORIENTATION[0]
 
-    const clickable = props.clickable === " click" ? props.clickable : ""
+    const checkMovable = props.pip.movable ? "click" : ""
+    const checkMovableOnClick = props.pip.movable ? props.pip.movable : null
 
+    const checkReceivable = props.pip.receivable ? "receivable" : ""
+    const checkReceivableOnClick = props.pip.receivable ? props.pip.receivable : null
+    
     return (
         <>
-            <div className="tri-column">
-                <div className={`tri ${checkTriangleStyle} ${checkTriangleOrientation}`}></div>
-                <div className={`checkers-column${clickable}`}>
+            <div className={`tri-column ${[checkMovable]}`} onClick={checkMovableOnClick}>
+                <div className={`tri ${checkTriangleStyle} ${checkTriangleOrientation} ${[checkReceivable]}`} onClick={checkReceivableOnClick}></div>
+                <div className={`checkers-column`}>
                     {props.children}
                 </div>
             </div>
