@@ -6,7 +6,6 @@ class Play extends Component {
   state = {
     dice: [],
     player1: true,
-    start: true,
     p1FirstChecker: 12,
     p2FirstChecker: 11,
     moving: false,
@@ -250,7 +249,6 @@ class Play extends Component {
     pips[11] = {player: 2, checkers: 10}
 
     this.setState({
-      start: false,
       pips: pips
     })
   }

@@ -20,7 +20,7 @@ export const Triangle = (props) => {
         <>
             <div className={`tri-column ${[checkMovable]}`} onClick={checkMovableOnClick}>
                 <div className={`tri ${checkTriangleStyle} ${checkTriangleOrientation} ${[checkReceivable]}`} onClick={checkReceivableOnClick}></div>
-                <div className={`checkers-column`}>
+                <div className={`checkers-column ${props.pip.checkers > 3 ? "" : "double-span"}`}>
                     {props.children}
                 </div>
             </div>

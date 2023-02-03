@@ -1,8 +1,6 @@
 .board {
-    height: 75vh;
-    width: 100%;
-    padding-right: 15px;
-    padding-left: 15px;
+    width: calc(100% - 2rem);
+    aspect-ratio: 64 / 25;
     margin: auto;
     position: relative;
 }

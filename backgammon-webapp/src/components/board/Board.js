@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React from 'react'
 import './Board.css'
 import {Triangle} from './Triangle';
 import {CheckerBox} from './outside/CheckerBox'
@@ -14,39 +14,15 @@ const handleCheckers = (player, number, movable) => {
 
     for(let i = 0; i < iterations; i++) {
         if (i === iterations - 1 && movable) {
-            checkers.push(<Checkers movable={movable} color={hue}/>)
+            checkers.push(<Checkers style={{"--start": i + 1}} movable={movable} color={hue}/>)
         } else {
-            checkers.push(<Checkers color={hue}/>)
+            checkers.push(<Checkers style={{"--start": i + 1}} color={hue}/>)
         }
     }
     return checkers;
 }
 
 const Board = (props) => {
-    useEffect(() => {
-        try{
-            const checkerColumn = document.getElementsByClassName("checkers-column");
-            for (var i = 0; i < checkerColumn.length; i++) {
-                var columnCheckers = checkerColumn[i].getElementsByClassName("checker-format"),
-                    scrollHeight = checkerColumn[i].scrollHeight,
-                    divHeight = checkerColumn[i].clientHeight,
-                    offset = (scrollHeight - divHeight) / (columnCheckers.length - 1);
-                if (columnCheckers.length > 4) {
-                    for (var j = 1; j < columnCheckers.length; j++) {
-                        if (checkerColumn[i].parentNode.children[0].className.includes("tri--up")){
-                        columnCheckers[j].style.transform = "translateY(+" + offset * j + "px)";
-                        columnCheckers[j].style.zIndex = columnCheckers.length + j
-                        } else {
-                        columnCheckers[j].style.transform = "translateY(-" + offset * j + "px)";
-                        }
-                    }
-                }
-            }
-        } catch (e) {
-            console.log(e)
-        }
-      }, [props.state.start]);
-
     var leftDice = ""
     var rightDice = ""
     var middleLeftDice = []

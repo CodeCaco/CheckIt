@@ -1,28 +1,81 @@
   .checker-format {
-    background: radial-gradient(circle, var(--color) 0%, var(--color) 40%, var(--rings) 45%, var(--color) 50%, var(--color) 55%, var(--rings) 60%, var(--color) 65%, var(--color) 100%);
-    box-shadow: -3px -3px 5px 5px rgba(0, 0, 0, 0.5) inset, 2px 2px 5px 3px rgba(255, 255, 255, 0.3) inset;
     position: relative;
-    width: 65%;
-    height: 20%;
+    background: var(--checker);
+    box-shadow: -3px -3px 5px 5px rgba(0, 0, 0, 0.5) inset, 2px 2px 5px 3px rgba(255, 255, 255, 0.3) inset;
+    width: 75%;
+    aspect-ratio: 1;
     top: 1%;
     margin: 0px auto;
     border-radius: 50%;
     pointer-events: none;
     flex: 0 0 20%;
     z-index: 11;
+    grid-row: var(--start) / span 2;
+    grid-column: 1 / -1;
   }
 
+  .checker-format::before {
+    content: '';
+    position: absolute;
+    inset: 20.5%;
+    border-radius: 100vmax;
+    outline: 2px solid var(--rings);
+  }
+
+  .checker-format::after {
+    content: '';
+    position: absolute;
+    inset: 10.5%;
+    border-radius: 100vmax;
+    outline: 2px solid var(--rings);
+  }
+
+  .double-span .checker-format {
+    grid-row-start: calc(2 * var(--start) - 1);
+  }
+
+  .region-down .checker-format {
+    transform: scaleY(-1);
+  }
+
+
   .checker-red {
-    --color: #e80000;
-    --rings: rgb(121, 1, 1);
+    --checker: #e80000;
+    --rings: rgb(121,1,1);
   }
 
   .checker-white {
-    --color: white;
+    --checker: white;
     --rings: grey;
   }
 
   .movable {
-    --color: rgb(0, 182, 0);
-    --rings: rgb(0, 125, 0);
+    animation-name: pulsating1;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+  }
+
+  .movable::before {
+    animation-name: pulsating2;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+  }
+
+  .movable::after {
+    animation-name: pulsating2;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+  }
+
+
+  @keyframes pulsating1 {
+    50% {
+      background: rgb(0,182,0);
+    }
+  }
+
+  @keyframes pulsating2 {
+    50% {
+      outline: 2px solid rgb(0, 125, 0);
+    }
   }
