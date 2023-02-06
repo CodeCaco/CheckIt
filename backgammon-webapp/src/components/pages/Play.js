@@ -30,6 +30,7 @@ class Play extends Component {
     }
 
     dice.sort((a, b) => b - a)
+    dice = [6, 3]
     let pips = this.cleanPips(this.state.pips)
 
     // find the available moves after the roll of the dice
@@ -78,7 +79,8 @@ class Play extends Component {
     playerPips.forEach((pip) => {
       const originIndex = pips.findIndex(p => p === pip)
       const pathOriginIndex = pipPath.findIndex(p => p === originIndex)
-  
+
+      console.log("Pip: ", originIndex)
       let numberOfPossibleDestinations = 0
       dice.forEach((die) => {
         // calculate the destination index to get pip from the pipPath
@@ -94,6 +96,10 @@ class Play extends Component {
           }
         }
       })
+
+      if(this.handleBearing(pips, pathOriginIndex, dice, pipPath)) {
+        numberOfPossibleDestinations++
+      }
 
       if (numberOfPossibleDestinations > 0) {
         newPips[originIndex].movable = this.checkerClick.bind(this, originIndex, pipPath, firstCheckerIndex)
@@ -224,6 +230,65 @@ class Play extends Component {
       }
   }
 
+  checkBearingPosition = (pips) => {
+    const player = this.state.player1 ? 1 : 2
+    let bearablePips = []
+    if (player === 1) {
+      bearablePips = [5, 4, 3, 2, 1, 0]
+    } else {
+      bearablePips = [18, 19, 20, 21, 22, 23]
+    }
+
+    const playerPips = bearablePips.filter(pip => pips[pip].player === player)
+    let sum = 0
+    playerPips.forEach((pip) => {
+      sum += pips[pip].checkers
+    })
+    
+    if (sum === 5) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  handleBearing = (pips, pipPathIndex, dice, pipPath) => {
+    let canBearOff = false
+    if (!this.checkBearingPosition(pips)) {
+      canBearOff = false
+    } else {
+      // check if die roll is exact to bear off
+      dice.forEach((die) => {
+        const exactBearOff = (pipPathIndex + die) === 24 ? true : false
+        if (exactBearOff) {
+          canBearOff = true
+        }
+      })
+
+      if (!canBearOff) {
+        const moreBearOff = (pipPathIndex + dice[0]) > 24 ? true : false
+        if (moreBearOff) {
+          let highestPointChecker = true
+          for (let i = pipPathIndex-1; i >= pipPath.length - 6; i--) {
+            const player = this.state.player1 ? 1 : 2
+            const backwardIndex = pipPath[i]
+            console.log("BI:", pips[backwardIndex])
+            if (pips[backwardIndex].checkers > 0 && pips[backwardIndex].player === player ) {
+              highestPointChecker = false
+            }
+            console.log(canBearOff)
+          }
+          if (highestPointChecker) {
+            canBearOff = true
+          }
+          console.log("HigherPointChecker: ", highestPointChecker)
+        }
+      }
+    }
+    console.log(canBearOff)
+    return canBearOff 
+  }
+
   // function responsible to give a new pip array without movable or receivable functions
   cleanPips = (pips) => {
     let newPips = pips.map((pip) => {
@@ -247,9 +312,10 @@ class Play extends Component {
   setCheckers = () => {
     const pips = [...this.state.pips]
 
-    pips[12] = {player: 1, checkers: 10}
-    pips[11] = {player: 2, checkers: 10}
-
+    pips[12] = {player: 1, checkers: 1}
+    pips[11] = {player: 2, checkers: 1}
+    pips[1] = {player: 1, checkers: 4}
+    pips[0] = {player: 1, checkers: 1}
     const boxes = [...this.state.boxes]
 
     boxes[0].checkers = 0
