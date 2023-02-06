@@ -1,0 +1,32 @@
+.side-checker {
+    position: relative;
+    background: var(--color);
+    box-shadow: 1px 3px 5px 3px rgba(31, 31, 31, 0.356) inset;
+    border-radius: 12%;
+}
+
+.side-checker::before {
+    content: '';
+    position: absolute;
+    inset: 10.5%;
+    border-radius: 12%;
+    outline: 2px solid var(--rings);
+  }
+
+.side-checker::after {
+    content: '';
+    position: absolute;
+    inset: 20.5%;
+    border-radius: 100vmax;
+    outline: 2px solid var(--rings);
+}
+
+.checker-red {
+    --color: #e80000;
+    --rings: rgb(121,1,1);
+  }
+
+.checker-white {
+    --color: white;
+    --rings: grey;
+}

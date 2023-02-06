@@ -9,7 +9,8 @@ class Play extends Component {
     p1FirstChecker: 12,
     p2FirstChecker: 11,
     moving: false,
-    pips: Array(24).fill({player: null, checkers: 0})
+    pips: Array(24).fill({player: null, checkers: 0}),
+    boxes: Array(2).fill().map((_, i) => ({player: i + 1, checkers: 10}))
   }
 
   // function responsible for handling the roll of the dice
@@ -245,11 +246,19 @@ class Play extends Component {
 
   setCheckers = () => {
     const pips = [...this.state.pips]
+
     pips[12] = {player: 1, checkers: 10}
     pips[11] = {player: 2, checkers: 10}
 
+    const boxes = [...this.state.boxes]
+
+    boxes[0].checkers = 0
+    boxes[1].checkers = 0  
+
+
     this.setState({
-      pips: pips
+      pips: pips,
+      boxes: boxes
     })
   }
 

@@ -1,10 +1,11 @@
 import React from 'react'
 import './Board.css'
-import {Triangle} from './Triangle';
-import {CheckerBox} from './outside/CheckerBox'
-import {Checkers} from '../pieces/Checkers'
+import { Triangle } from './Triangle';
+import { CheckerBox } from './outside/boxes/CheckerBox'
+import { Checkers } from '../pieces/Checkers'
 import { RollDice } from './outside/dice/RollDice';
 import { Dice } from './outside/dice/Dice';
+import { BearedChecker } from './outside/boxes/BearedChecker'
 
 const handleCheckers = (player, number, movable) => {
     const iterations = number;
@@ -20,6 +21,18 @@ const handleCheckers = (player, number, movable) => {
         }
     }
     return checkers;
+}
+
+const handleBearedChecker = (player, number) => {
+  const iterations = number;
+
+  const hue = player === 1 ? "checker-red" : "checker-white"
+  const checkers = []
+
+  for(let i = 0; i < iterations; i++) {
+      checkers.push(<BearedChecker key={"bearedChecker" + hue + i} color={hue}/>)
+    }
+  return checkers;
 }
 
 const Board = (props) => {
@@ -47,7 +60,7 @@ const Board = (props) => {
 
   return (
     <div className="board">
-      <CheckerBox side="left">{leftDice}</CheckerBox>
+      <CheckerBox box={props.state.boxes[0]} checker={handleBearedChecker(props.state.boxes[0].player, props.state.boxes[0].checkers)} side="left">{leftDice}</CheckerBox>
       <div className="board-left">
         <div className="region-up">
             {[1, 0, 1, 0, 1, 0].map((a, i) => {
@@ -97,7 +110,7 @@ const Board = (props) => {
           )}
         </div>
       </div>
-      <CheckerBox side="right">{rightDice}</CheckerBox>
+      <CheckerBox box={props.state.boxes[1]} checker={handleBearedChecker(props.state.boxes[1].player, props.state.boxes[1].checkers)} side="right bottom">{rightDice}</CheckerBox>
       <button onClick={props.clear}>Clear</button>
     </div>
   )

@@ -16,11 +16,12 @@ export const Triangle = (props) => {
     const checkReceivable = props.pip.receivable ? "receivable" : ""
     const checkReceivableOnClick = props.pip.receivable ? props.pip.receivable : null
     
+    const checkSpan = props.pip.checkers <= 3 ? "double-span" : ""
     return (
         <>
             <div className={`tri-column ${[checkMovable]}`} onClick={checkMovableOnClick}>
                 <div className={`tri ${checkTriangleStyle} ${checkTriangleOrientation} ${[checkReceivable]}`} onClick={checkReceivableOnClick}></div>
-                <div className={`checkers-column ${props.pip.checkers > 3 ? "" : "double-span"}`}>
+                <div className={`checkers-column ${checkSpan}`}>
                     {props.children}
                 </div>
             </div>
