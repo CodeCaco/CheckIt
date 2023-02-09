@@ -4,7 +4,7 @@
     height: 35%;
     width: 100%;
     display: grid; 
-    grid-template-rows: repeat(10, 1fr);
+    grid-template-rows: repeat(15, 1fr);
     box-shadow: 3px 3px 5px 3px rgba(31, 31, 31, 0.356) inset;
 }
 
@@ -40,6 +40,11 @@
     height: 35%;
     width: 100%;
     display: grid; 
-    grid-template-rows: repeat(10, 1fr);
+    grid-template-rows: repeat(15, 1fr);
     box-shadow: 3px 15px 5px 3px rgba(31, 31, 31, 0.356) inset;
+}
+
+.box-receivable {
+    background-color: rgba(0, 128, 0, 0.70);
+    cursor: pointer;
 }
