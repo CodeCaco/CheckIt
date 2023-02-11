@@ -42,6 +42,7 @@
     display: grid; 
     grid-template-rows: repeat(15, 1fr);
     box-shadow: 3px 15px 5px 3px rgba(31, 31, 31, 0.356) inset;
+    transform: scaleY(-1);
 }
 
 .box-receivable {

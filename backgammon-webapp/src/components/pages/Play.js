@@ -29,13 +29,13 @@ class Play extends Component {
       }
     }
 
-    dice = [6, 6, 3]
     dice.sort((a, b) => b - a)
     let pips = this.cleanPips(this.state.pips)
+    let boxes = this.cleanBoxes(this.state.boxes)
 
     // find the available moves after the roll of the dice
     const firstCheckerIndex = this.state.player1 ? this.state.p1FirstChecker : this.state.p2FirstChecker
-    const moves = this.findMoves(pips, dice, firstCheckerIndex)
+    const moves = this.findMoves(pips, dice, firstCheckerIndex, boxes)
 
     this.setState({
       dice: dice,
@@ -44,7 +44,7 @@ class Play extends Component {
   }
 
   // function that handles the highlighting of all checkers that are allows to move
-  findMoves = (pips, dice, firstCheckerIndex) => {
+  findMoves = (pips, dice, firstCheckerIndex, boxes) => {
     let pipPath = []
     let playerPips = []
 
@@ -96,7 +96,7 @@ class Play extends Component {
         }
       })
 
-      if(this.handleBearing(pips, pathOriginIndex, dice, pipPath).canBearOff) {
+      if(this.handleBearing(pips, pathOriginIndex, dice, pipPath, boxes).canBearOff) {
         numberOfPossibleDestinations++
       }
 
@@ -145,7 +145,7 @@ class Play extends Component {
         pips[pip.index].receivable = this.receiverClick.bind(this, pip.index, pip.die)
       })
 
-      const bearOffInformation = this.handleBearing(pips, pathOriginIndex, dice, pipPath)
+      const bearOffInformation = this.handleBearing(pips, pathOriginIndex, dice, pipPath, boxes)
       if (bearOffInformation.canBearOff) {
         const player = this.state.player1 ? 0 : 1
         boxes[player].receivable = this.receiverClick.bind(this, null, bearOffInformation.bearableDie)
@@ -153,7 +153,7 @@ class Play extends Component {
 
     } else {
       // if checker is unset then find and highlight all the checkers available to move again
-      const moves = this.findMoves(pips, this.state.dice, firstCheckerIndex);
+      const moves = this.findMoves(pips, this.state.dice, firstCheckerIndex, boxes);
       pips = moves.pips;
     }
     
@@ -208,8 +208,8 @@ class Play extends Component {
 
     if (index === null) {
       boxes[player - 1].checkers++
-      if (boxes[player - 1].checkers === 1) {
-        console.log("End")
+      if (boxes[player - 1].checkers === 15) {
+        console.log("Game Ended")
       }
     } else {
       // add a checker to the destination pip & update the pip's player occupation to that of the checker owner
@@ -223,7 +223,7 @@ class Play extends Component {
 
     // check if player still has moves left to perform, if not switch players
     if (dice.length !== 0) {
-      const moves = this.findMoves(pips, dice, firstCheckerIndex);
+      const moves = this.findMoves(pips, dice, firstCheckerIndex, boxes);
       pips = moves.pips;
       player = this.state.player1
     } else {
@@ -249,7 +249,7 @@ class Play extends Component {
   }
 
   // function that iterates through the last table and sees if user has all the checkers in it meaning it can start bearing off pieces
-  checkBearingPosition = (pips) => {
+  checkBearingPosition = (pips, boxes) => {
     const player = this.state.player1 ? 1 : 2
     let bearablePips = []
     if (player === 1) {
@@ -264,7 +264,7 @@ class Play extends Component {
       sum += pips[pip].checkers
     })
     
-    if (sum === 5) {
+    if (sum === (15 - boxes[player - 1].checkers)) {
       return true
     } else {
       return false
@@ -272,12 +272,12 @@ class Play extends Component {
   }
 
   // function that checks if checker is allowed to bear off or not
-  handleBearing = (pips, pipPathIndex, dice, pipPath) => {
+  handleBearing = (pips, pipPathIndex, dice, pipPath, boxes) => {
     let canBearOff = false
     let bearableDie = null
 
     // check if the board position allows for bearing off
-    if (!this.checkBearingPosition(pips)) {
+    if (!this.checkBearingPosition(pips, boxes)) {
       canBearOff = false
     } else {
       // check if die roll is exact to bear off
@@ -352,10 +352,22 @@ class Play extends Component {
     const pips = [...this.state.pips]
 
     pips[12] = {player: 1, checkers: 1}
-    pips[11] = {player: 2, checkers: 15}
 
     pips[0] = {player: 1, checkers: 2}
-    pips[2] = {player: 1, checkers: 3}
+    pips[1] = {player: 1, checkers: 2}
+    pips[2] = {player: 1, checkers: 2}
+    pips[3] = {player: 1, checkers: 3}
+    pips[4] = {player: 1, checkers: 5}
+
+    pips[11] = {player: 2, checkers: 1}
+
+    pips[23] = {player: 2, checkers: 2}
+    pips[22] = {player: 2, checkers: 2}
+    pips[21] = {player: 2, checkers: 2}
+    pips[20] = {player: 2, checkers: 3}
+    pips[19] = {player: 2, checkers: 5}
+   
+
 
     const boxes = [...this.state.boxes]
 
