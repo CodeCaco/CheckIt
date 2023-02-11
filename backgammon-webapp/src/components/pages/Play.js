@@ -74,6 +74,7 @@ class Play extends Component {
     }
 
     let newPips = this.cleanPips(pips)
+    let foundMoves = false
 
     // for each pip find the ones that have movable checkers
     playerPips.forEach((pip) => {
@@ -102,9 +103,12 @@ class Play extends Component {
 
       if (numberOfPossibleDestinations > 0) {
         newPips[originIndex].movable = this.checkerClick.bind(this, originIndex, pipPath, firstCheckerIndex)
+        foundMoves = true
       }
     });
-
+    if (!foundMoves) {
+      console.log("No Moves Available")
+    }
     return {pips: newPips}
   }
 
@@ -337,6 +341,7 @@ class Play extends Component {
   }
 
   clearDice = () => {
+    console.log("yappie")
     var checkers = [...document.getElementsByClassName("movable")]
     checkers.forEach((checker) => {
       checker.className = checker.className.replace(" movable" , "")
