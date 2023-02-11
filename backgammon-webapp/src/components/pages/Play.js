@@ -97,15 +97,19 @@ class Play extends Component {
         }
       })
 
+      // check if checker is in a bearable position
       if(this.handleBearing(pips, pathOriginIndex, dice, pipPath, boxes).canBearOff) {
         numberOfPossibleDestinations++
       }
 
+      // if there are possible destinations then mark that checker has movable
       if (numberOfPossibleDestinations > 0) {
         newPips[originIndex].movable = this.checkerClick.bind(this, originIndex, pipPath, firstCheckerIndex)
         foundMoves = true
       }
     });
+
+    // check if there are not more moves available
     if (!foundMoves) {
       console.log("No Moves Available")
     }
@@ -149,6 +153,7 @@ class Play extends Component {
         pips[pip.index].receivable = this.receiverClick.bind(this, pip.index, pip.die)
       })
 
+      // if checker is bearable then highlight checker box as a possible destination
       const bearOffInformation = this.handleBearing(pips, pathOriginIndex, dice, pipPath, boxes)
       if (bearOffInformation.canBearOff) {
         const player = this.state.player1 ? 0 : 1
@@ -208,10 +213,14 @@ class Play extends Component {
     
     // update moving checker to null to notify that no checker is moving 
     moving = null
+
     let player = this.state.player1 ? 1 : 2
 
+    // if index is null, then checker is bearing off thus adding incrementing the checkers in checker box
     if (index === null) {
       boxes[player - 1].checkers++
+
+      // check if game has ended by having 15 checkers in the checker box
       if (boxes[player - 1].checkers === 15) {
         console.log("Game Ended")
       }
@@ -341,7 +350,6 @@ class Play extends Component {
   }
 
   clearDice = () => {
-    console.log("yappie")
     var checkers = [...document.getElementsByClassName("movable")]
     checkers.forEach((checker) => {
       checker.className = checker.className.replace(" movable" , "")
@@ -356,21 +364,23 @@ class Play extends Component {
   setCheckers = () => {
     const pips = [...this.state.pips]
 
-    pips[12] = {player: 1, checkers: 1}
+    pips[12] = {player: 1, checkers: 15}
 
-    pips[0] = {player: 1, checkers: 2}
-    pips[1] = {player: 1, checkers: 2}
-    pips[2] = {player: 1, checkers: 2}
-    pips[3] = {player: 1, checkers: 3}
-    pips[4] = {player: 1, checkers: 5}
+    // // bearing off test setup
+    // pips[0] = {player: 1, checkers: 2}
+    // pips[1] = {player: 1, checkers: 2}
+    // pips[2] = {player: 1, checkers: 2}
+    // pips[3] = {player: 1, checkers: 3}
+    // pips[4] = {player: 1, checkers: 5}
 
-    pips[11] = {player: 2, checkers: 1}
+    pips[11] = {player: 2, checkers: 15}
 
-    pips[23] = {player: 2, checkers: 2}
-    pips[22] = {player: 2, checkers: 2}
-    pips[21] = {player: 2, checkers: 2}
-    pips[20] = {player: 2, checkers: 3}
-    pips[19] = {player: 2, checkers: 5}
+    // // bearing off test setup
+    // pips[23] = {player: 2, checkers: 2}
+    // pips[22] = {player: 2, checkers: 2}
+    // pips[21] = {player: 2, checkers: 2}
+    // pips[20] = {player: 2, checkers: 3}
+    // pips[19] = {player: 2, checkers: 5}
    
 
 
