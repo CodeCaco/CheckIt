@@ -11,7 +11,7 @@ export const Checkers = (props) => {
 
     return (
         <>
-            <div className={`checker-format ${[checkCheckerCOLOR]} ${[checkMovable]}`}></div>
+            <div style={props.style} className={`checker-format ${[checkCheckerCOLOR]} ${[checkMovable]}`}></div>
         </>
     )
 };

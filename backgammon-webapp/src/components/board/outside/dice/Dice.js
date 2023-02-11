@@ -31,14 +31,10 @@ const three = (props) => {
 const four = (props) => {
     return (
         <div className={`btn-dice ${props} four`}>
-            <div className="dice-column">
-                <span className="btn-dot"></span>
-                <span className="btn-dot"></span>
-            </div>
-            <div className="dice-column">
-                <span className="btn-dot"></span>
-                <span className="btn-dot"></span> 
-            </div>
+            <span className="btn-dot"></span>
+            <span className="btn-dot"></span>
+            <span className="btn-dot"></span>
+            <span className="btn-dot"></span> 
         </div>
     )
 }
@@ -46,17 +42,11 @@ const four = (props) => {
 const five = (props) => {
     return (
         <div className={`btn-dice ${props} five`}>
-            <div className="dice-column">
-                <span className="btn-dot"></span>
-                <span className="btn-dot"></span>
-            </div>
-            <div className="dice-column">
-                <span className="btn-dot"></span>
-            </div>
-            <div className="dice-column">
-                <span className="btn-dot"></span>
-                <span className="btn-dot"></span> 
-            </div>
+            <span className="btn-dot"></span>
+            <span className="btn-dot"></span>
+            <span className="btn-dot"></span>
+            <span className="btn-dot"></span>
+            <span className="btn-dot"></span> 
         </div>
     )
 }
@@ -64,16 +54,12 @@ const five = (props) => {
 const six = (props) => {
     return (
         <div className={`btn-dice ${props} six`}>
-            <div className="dice-column">
-                <span className="btn-dot"></span>
-                <span className="btn-dot"></span>
-                <span className="btn-dot"></span>
-            </div>
-            <div className="dice-column">
-                <span className="btn-dot"></span>
-                <span className="btn-dot"></span>
-                <span className="btn-dot"></span> 
-            </div>
+            <span className="btn-dot"></span>
+            <span className="btn-dot"></span>
+            <span className="btn-dot"></span>
+            <span className="btn-dot"></span>
+            <span className="btn-dot"></span>
+            <span className="btn-dot"></span> 
         </div>
     )
 }

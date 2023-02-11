@@ -4,21 +4,18 @@
 }
 
 .checkers-column {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: repeat(16, 1fr);
     width: 100%;
     height: 100%;
 }
 
 .region-down .checkers-column {
-    flex-direction: column-reverse;
+    pointer-events: none;
+    transform: scaleY(-1);
 }
 
 .click {
-    cursor: pointer;
-}
-
-.receivable {
     cursor: pointer;
 }
 
@@ -57,4 +54,5 @@
 
 .receivable {
     --color: rgba(0, 128, 0, 0.70);
+    cursor: pointer;
 }

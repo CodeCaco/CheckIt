@@ -6,11 +6,11 @@ class Play extends Component {
   state = {
     dice: [],
     player1: true,
-    start: true,
     p1FirstChecker: 12,
     p2FirstChecker: 11,
     moving: false,
-    pips: Array(24).fill({player: null, checkers: 0})
+    pips: Array(24).fill({player: null, checkers: 0}),
+    boxes: Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15}))
   }
 
   // function responsible for handling the roll of the dice
@@ -31,10 +31,11 @@ class Play extends Component {
 
     dice.sort((a, b) => b - a)
     let pips = this.cleanPips(this.state.pips)
+    let boxes = this.cleanBoxes(this.state.boxes)
 
     // find the available moves after the roll of the dice
     const firstCheckerIndex = this.state.player1 ? this.state.p1FirstChecker : this.state.p2FirstChecker
-    const moves = this.findMoves(pips, dice, firstCheckerIndex)
+    const moves = this.findMoves(pips, dice, firstCheckerIndex, boxes)
 
     this.setState({
       dice: dice,
@@ -43,7 +44,7 @@ class Play extends Component {
   }
 
   // function that handles the highlighting of all checkers that are allows to move
-  findMoves = (pips, dice, firstCheckerIndex) => {
+  findMoves = (pips, dice, firstCheckerIndex, boxes) => {
     let pipPath = []
     let playerPips = []
 
@@ -73,12 +74,13 @@ class Play extends Component {
     }
 
     let newPips = this.cleanPips(pips)
+    let foundMoves = false
 
     // for each pip find the ones that have movable checkers
     playerPips.forEach((pip) => {
       const originIndex = pips.findIndex(p => p === pip)
       const pathOriginIndex = pipPath.findIndex(p => p === originIndex)
-  
+
       let numberOfPossibleDestinations = 0
       dice.forEach((die) => {
         // calculate the destination index to get pip from the pipPath
@@ -95,11 +97,22 @@ class Play extends Component {
         }
       })
 
+      // check if checker is in a bearable position
+      if(this.handleBearing(pips, pathOriginIndex, dice, pipPath, boxes).canBearOff) {
+        numberOfPossibleDestinations++
+      }
+
+      // if there are possible destinations then mark that checker has movable
       if (numberOfPossibleDestinations > 0) {
         newPips[originIndex].movable = this.checkerClick.bind(this, originIndex, pipPath, firstCheckerIndex)
+        foundMoves = true
       }
     });
 
+    // check if there are not more moves available
+    if (!foundMoves) {
+      console.log("No Moves Available")
+    }
     return {pips: newPips}
   }
 
@@ -109,10 +122,11 @@ class Play extends Component {
 
     // remove all the highlights from the board
     let pips = this.cleanPips(this.state.pips)
-
+    let boxes = this.cleanBoxes(this.state.boxes)
+    
     // check if checker was set or unset by player
     const checker = originIndex !== this.state.moving ? originIndex : false
-  
+
     if (checker !== false) {
       // highlight the checker that's moving
       pips[checker].movable = this.checkerClick.bind(this, checker, pipPath, firstCheckerIndex)
@@ -134,18 +148,28 @@ class Play extends Component {
           }
         }
       });
+
       possibleDestinations.forEach((pip) => {
         pips[pip.index].receivable = this.receiverClick.bind(this, pip.index, pip.die)
       })
+
+      // if checker is bearable then highlight checker box as a possible destination
+      const bearOffInformation = this.handleBearing(pips, pathOriginIndex, dice, pipPath, boxes)
+      if (bearOffInformation.canBearOff) {
+        const player = this.state.player1 ? 0 : 1
+        boxes[player].receivable = this.receiverClick.bind(this, null, bearOffInformation.bearableDie)
+      }
+
     } else {
       // if checker is unset then find and highlight all the checkers available to move again
-      const moves = this.findMoves(pips, this.state.dice, firstCheckerIndex);
+      const moves = this.findMoves(pips, this.state.dice, firstCheckerIndex, boxes);
       pips = moves.pips;
     }
     
     this.setState({
       pips: pips,
-      moving: checker
+      moving: checker,
+      boxes: boxes
     })
   }
 
@@ -175,6 +199,8 @@ class Play extends Component {
     }
 
     let pips = this.cleanPips(this.state.pips)
+    let boxes = this.cleanBoxes(this.state.boxes)
+
     let moving = this.state.moving
 
     // remove checker from the origin pip
@@ -188,11 +214,21 @@ class Play extends Component {
     // update moving checker to null to notify that no checker is moving 
     moving = null
 
-    // add a checker to the destination pip & update the pip's player occupation to that of the checker owner
-    pips[index].checkers++
     let player = this.state.player1 ? 1 : 2
-    pips[index].player = player
 
+    // if index is null, then checker is bearing off thus adding incrementing the checkers in checker box
+    if (index === null) {
+      boxes[player - 1].checkers++
+
+      // check if game has ended by having 15 checkers in the checker box
+      if (boxes[player - 1].checkers === 15) {
+        console.log("Game Ended")
+      }
+    } else {
+      // add a checker to the destination pip & update the pip's player occupation to that of the checker owner
+      pips[index].checkers++
+      pips[index].player = player
+    }
     // after move is done, remove the die responsible for said move
     let dice = this.state.dice
     const dieIndex = dice.findIndex(d => d === die)
@@ -200,7 +236,7 @@ class Play extends Component {
 
     // check if player still has moves left to perform, if not switch players
     if (dice.length !== 0) {
-      const moves = this.findMoves(pips, dice, firstCheckerIndex);
+      const moves = this.findMoves(pips, dice, firstCheckerIndex, boxes);
       pips = moves.pips;
       player = this.state.player1
     } else {
@@ -211,7 +247,8 @@ class Play extends Component {
       dice: dice,
       pips: pips,
       player1: player,
-      moving: moving
+      moving: moving,
+      boxes: boxes
     })
     if (this.state.player1) {
       this.setState({
@@ -224,12 +261,92 @@ class Play extends Component {
       }
   }
 
+  // function that iterates through the last table and sees if user has all the checkers in it meaning it can start bearing off pieces
+  checkBearingPosition = (pips, boxes) => {
+    const player = this.state.player1 ? 1 : 2
+    let bearablePips = []
+    if (player === 1) {
+      bearablePips = [5, 4, 3, 2, 1, 0]
+    } else {
+      bearablePips = [18, 19, 20, 21, 22, 23]
+    }
+
+    const playerPips = bearablePips.filter(pip => pips[pip].player === player)
+    let sum = 0
+    playerPips.forEach((pip) => {
+      sum += pips[pip].checkers
+    })
+    
+    if (sum === (15 - boxes[player - 1].checkers)) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  // function that checks if checker is allowed to bear off or not
+  handleBearing = (pips, pipPathIndex, dice, pipPath, boxes) => {
+    let canBearOff = false
+    let bearableDie = null
+
+    // check if the board position allows for bearing off
+    if (!this.checkBearingPosition(pips, boxes)) {
+      canBearOff = false
+    } else {
+      // check if die roll is exact to bear off
+      dice.forEach((die) => {
+        const exactBearOff = (pipPathIndex + die) === 24 ? true : false
+        if (exactBearOff) {
+          canBearOff = true
+          bearableDie = die
+        }
+      })
+
+      // if there is not exact bear off we need to check if there are checkers that could utilise a portion of die to bear off
+      if (!canBearOff) {
+      
+        // calculate if die is more than the remaining path of checker
+        const moreBearOff = (pipPathIndex + dice[0]) > 24 ? true : false
+
+        // if it is, we need to check if there are checkers behind that have priority move
+        if (moreBearOff) {
+          let highestPipChecker = true
+      
+          // loop through each pip behind and check if it has a checker by checking if the current pip is the highest pip checker
+          for (let i = pipPathIndex-1; i >= pipPath.length - 6; i--) {
+            const player = this.state.player1 ? 1 : 2
+            const backwardIndex = pipPath[i]
+
+            // if it encounters a pip with checkers that belong to the user wishing to bear off, then that means that the checker is not the highest pip checker
+            if (pips[backwardIndex].checkers > 0 && pips[backwardIndex].player === player ) {
+              highestPipChecker = false
+            }
+          }
+
+          // if no pip has checkers that belong to user, then checker is allowed to bear off
+          if (highestPipChecker) {
+            canBearOff = true
+            bearableDie = dice[0]
+          }
+        }
+      }
+    }
+    return {canBearOff: canBearOff, bearableDie: bearableDie}
+  }
+
   // function responsible to give a new pip array without movable or receivable functions
   cleanPips = (pips) => {
     let newPips = pips.map((pip) => {
       return {player: pip.player, checkers: pip.checkers}
     })
     return newPips
+  }
+
+  cleanBoxes = (boxes) => {
+    let newBoxes = boxes.map((box, i) => {
+      return {player: i + 1, checkers: box.checkers}
+    })
+    return newBoxes
   }
 
   clearDice = () => {
@@ -246,12 +363,36 @@ class Play extends Component {
 
   setCheckers = () => {
     const pips = [...this.state.pips]
-    pips[12] = {player: 1, checkers: 10}
-    pips[11] = {player: 2, checkers: 10}
+
+    pips[12] = {player: 1, checkers: 15}
+
+    // // bearing off test setup
+    // pips[0] = {player: 1, checkers: 2}
+    // pips[1] = {player: 1, checkers: 2}
+    // pips[2] = {player: 1, checkers: 2}
+    // pips[3] = {player: 1, checkers: 3}
+    // pips[4] = {player: 1, checkers: 5}
+
+    pips[11] = {player: 2, checkers: 15}
+
+    // // bearing off test setup
+    // pips[23] = {player: 2, checkers: 2}
+    // pips[22] = {player: 2, checkers: 2}
+    // pips[21] = {player: 2, checkers: 2}
+    // pips[20] = {player: 2, checkers: 3}
+    // pips[19] = {player: 2, checkers: 5}
+   
+
+
+    const boxes = [...this.state.boxes]
+
+    boxes[0].checkers = 0
+    boxes[1].checkers = 0  
+
 
     this.setState({
-      start: false,
-      pips: pips
+      pips: pips,
+      boxes: boxes
     })
   }
 

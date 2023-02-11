@@ -3,8 +3,20 @@
     top: 0;
     height: 35%;
     width: 100%;
-    display: flex;
+    display: grid; 
+    grid-template-rows: repeat(15, 1fr);
     box-shadow: 3px 3px 5px 3px rgba(31, 31, 31, 0.356) inset;
+}
+
+.counter {
+    position: absolute;
+    margin: -15px;
+    font-size: 1.5vw;
+}
+
+.bottom.counter{
+    bottom: 0;
+    margin: -15px;
 }
 
 .box-middle {
@@ -14,9 +26,9 @@
     width: 100%;
     border-top: 25px;
     border-bottom: 25px;
-    border-image: url("../../../assets/leather.jpeg") 10% 30% / 20px 10px / 10px;
+    border-image: url("../../../../assets/leather.jpeg") 10% 30% / 20px 10px / 10px;
     box-shadow: 3px 15px 15px 3px rgb(31, 31, 31) inset;
-    background-image: url("../../../assets/cloth.jpg");
+    background-image: url("../../../../assets/cloth.jpg");
     align-items: center;
     justify-content: center;
     display: flex;
@@ -27,6 +39,13 @@
     bottom: 0;
     height: 35%;
     width: 100%;
-    display: flex;
+    display: grid; 
+    grid-template-rows: repeat(15, 1fr);
     box-shadow: 3px 15px 5px 3px rgba(31, 31, 31, 0.356) inset;
+    transform: scaleY(-1);
+}
+
+.box-receivable {
+    background-color: rgba(0, 128, 0, 0.70);
+    cursor: pointer;
 }

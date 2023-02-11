@@ -1,10 +1,11 @@
-import React, {useEffect} from 'react'
+import React from 'react'
 import './Board.css'
-import {Triangle} from './Triangle';
-import {CheckerBox} from './outside/CheckerBox'
-import {Checkers} from '../pieces/Checkers'
+import { Triangle } from './Triangle';
+import { CheckerBox } from './outside/boxes/CheckerBox'
+import { Checkers } from '../pieces/Checkers'
 import { RollDice } from './outside/dice/RollDice';
 import { Dice } from './outside/dice/Dice';
+import { BearedChecker } from './outside/boxes/BearedChecker'
 
 const handleCheckers = (player, number, movable) => {
     const iterations = number;
@@ -14,39 +15,27 @@ const handleCheckers = (player, number, movable) => {
 
     for(let i = 0; i < iterations; i++) {
         if (i === iterations - 1 && movable) {
-            checkers.push(<Checkers movable={movable} color={hue}/>)
+            checkers.push(<Checkers style={{"--start": i + 1}} movable={movable} color={hue}/>)
         } else {
-            checkers.push(<Checkers color={hue}/>)
+            checkers.push(<Checkers style={{"--start": i + 1}} color={hue}/>)
         }
     }
     return checkers;
 }
 
-const Board = (props) => {
-    useEffect(() => {
-        try{
-            const checkerColumn = document.getElementsByClassName("checkers-column");
-            for (var i = 0; i < checkerColumn.length; i++) {
-                var columnCheckers = checkerColumn[i].getElementsByClassName("checker-format"),
-                    scrollHeight = checkerColumn[i].scrollHeight,
-                    divHeight = checkerColumn[i].clientHeight,
-                    offset = (scrollHeight - divHeight) / (columnCheckers.length - 1);
-                if (columnCheckers.length > 4) {
-                    for (var j = 1; j < columnCheckers.length; j++) {
-                        if (checkerColumn[i].parentNode.children[0].className.includes("tri--up")){
-                        columnCheckers[j].style.transform = "translateY(+" + offset * j + "px)";
-                        columnCheckers[j].style.zIndex = columnCheckers.length + j
-                        } else {
-                        columnCheckers[j].style.transform = "translateY(-" + offset * j + "px)";
-                        }
-                    }
-                }
-            }
-        } catch (e) {
-            console.log(e)
-        }
-      }, [props.state.start]);
+const handleBearedChecker = (player, number) => {
+  const iterations = number;
 
+  const hue = player === 1 ? "checker-red" : "checker-white"
+  const checkers = []
+
+  for(let i = 0; i < iterations; i++) {
+      checkers.push(<BearedChecker key={"bearedChecker" + hue + i} color={hue}/>)
+    }
+  return checkers;
+}
+
+const Board = (props) => {
     var leftDice = ""
     var rightDice = ""
     var middleLeftDice = []
@@ -71,7 +60,7 @@ const Board = (props) => {
 
   return (
     <div className="board">
-      <CheckerBox side="left">{leftDice}</CheckerBox>
+      <CheckerBox box={props.state.boxes[0]} checker={handleBearedChecker(props.state.boxes[0].player, props.state.boxes[0].checkers)} side="left">{leftDice}</CheckerBox>
       <div className="board-left">
         <div className="region-up">
             {[1, 0, 1, 0, 1, 0].map((a, i) => {
@@ -121,7 +110,7 @@ const Board = (props) => {
           )}
         </div>
       </div>
-      <CheckerBox side="right">{rightDice}</CheckerBox>
+      <CheckerBox box={props.state.boxes[1]} checker={handleBearedChecker(props.state.boxes[1].player, props.state.boxes[1].checkers)} side="right bottom">{rightDice}</CheckerBox>
       <button onClick={props.clear}>Clear</button>
     </div>
   )
