@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import '../../App.css';
+import './Play.css'
 import Board from '../board/Board';
+import { ProgressBar } from '../board/ProgressBar';
 
 class Play extends Component {
   state = {
@@ -10,7 +12,8 @@ class Play extends Component {
     p2FirstChecker: 11,
     moving: false,
     pips: Array(24).fill({player: null, checkers: 0}),
-    boxes: Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15}))
+    boxes: Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15})),
+    redWP: 50
   }
 
   // function responsible for handling the roll of the dice
@@ -389,16 +392,20 @@ class Play extends Component {
     boxes[0].checkers = 0
     boxes[1].checkers = 0  
 
-
+    const redWP = 10
     this.setState({
       pips: pips,
-      boxes: boxes
+      boxes: boxes,
+      redWP: redWP 
     })
   }
 
   render() {
   return (
       <>
+        <div className="progress">
+          <ProgressBar redWP={this.state.redWP}></ProgressBar>
+        </div>
         <div className="playground">
           <Board state={this.state} player1={this.state.player1} rollDice={this.calculateRoll} dice={this.state.dice} clear={this.clearDice}/>
         </div>

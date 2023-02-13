@@ -1,0 +1,12 @@
+.white-bar {
+    width: 100%;
+    aspect-ratio: 32;
+    background-color: white;
+}
+
+.red-bar {
+    width: var(--red-percentage);
+    height: 100%;
+    background-color: red;
+    transition: width 1s ease-in-out;
+}
