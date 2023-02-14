@@ -12,6 +12,8 @@ class Play extends Component {
     p2FirstChecker: 11,
     moving: false,
     pips: Array(24).fill({player: null, checkers: 0}),
+    p1Path: [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
+    p2Path: [11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
     boxes: Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15})),
     redWP: 50
   }
@@ -54,7 +56,7 @@ class Play extends Component {
     // for both players specify it's path and which pips have checkers that are allowed to move
     if (this.state.player1) {
       // this array is responsible for the pip path each player follows
-      pipPath = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+      pipPath = this.state.p1Path
 
       // if the first checker still hasn't moved from starting table, only find the pip of that first checker
       if (firstCheckerIndex !== false) {
@@ -65,7 +67,7 @@ class Play extends Component {
       }
     } else {
       // this array is responsible for the pip path each player follows
-      pipPath = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+      pipPath = this.state.p2Path
 
       // if the first checker still hasn't moved from starting table, only find the pip of that first checker
       if (firstCheckerIndex !== false) {
@@ -246,12 +248,15 @@ class Play extends Component {
       player = !this.state.player1
     }
 
+    const redWP = this.calculateRedWP(pips)
+
     this.setState({
       dice: dice,
       pips: pips,
       player1: player,
       moving: moving,
-      boxes: boxes
+      boxes: boxes,
+      redWP: redWP
     })
     if (this.state.player1) {
       this.setState({
@@ -337,6 +342,133 @@ class Play extends Component {
     return {canBearOff: canBearOff, bearableDie: bearableDie}
   }
 
+  calculateRPC = (pips) => {
+    let playerRPCS = Array(2).fill().map((_, i) => ({player: i + 1, rpc: 0}))
+
+    playerRPCS.forEach((player, i) => {
+      const pipPath = player.player === 1 ? this.state.p1Path : this.state.p2Path
+      const playerPips = pips.filter(pip => pip.player === player.player)
+      playerPips.forEach((pip) => {
+        const originIndex = pips.findIndex(p => p === pip)
+        const pathOriginIndex = pipPath.findIndex(p => p === originIndex)
+        const remainingPath = (pipPath.length) - pathOriginIndex
+        playerRPCS[i].rpc += remainingPath * pip.checkers
+      })
+    })
+    return playerRPCS
+  }
+
+  getClosestValue = (a) => {
+    if (a === 0) {
+      return 0.5
+    }
+    const probabilityTable = {
+      0: 0.5,
+      0.00137882: 0.51,
+      0.00551875: 0.52,
+      0.0124302: 0.53,
+      0.0221307: 0.54,
+      0.0346450: 0.55,
+      0.0500050: 0.56,
+      0.0682506: 0.57,
+      0.0894296: 0.58,
+      0.113598: 0.59,
+      0.140821: 0.6,
+      0.171174: 0.61,
+      0.204741: 0.62,
+      0.241618: 0.63,
+      0.281913: 0.64,
+      0.325747: 0.65,
+      0.373256: 0.66,
+      0.424591: 0.67,
+      0.479920: 0.68,
+      0.539433: 0.69,
+      0.603341: 0.7,
+      0.671879: 0.71,
+      0.745311: 0.72,
+      0.823934: 0.73,
+      0.908082: 0.74,
+      0.998131: 0.75,
+      1.09451: 0.76,
+      1.19769: 0.77,
+      1.30824: 0.78,
+      1.42679: 0.79,
+      1.55407: 0.8,
+      1.69092: 0.81,
+      1.83834: 0.82,
+      1.99749: 0.83,
+      2.16975: 0.84,
+      2.35678: 0.85,
+      2.56060: 0.86,
+      2.78365: 0.87,
+      3.02902: 0.88,
+      3.30059: 0.89,
+      3.60337: 0.9,
+      3.94399: 0.91,
+      4.33145: 0.92,
+      4.77844: 0.93,
+      5.30360: 0.94,
+      5.93596: 0.95,
+      6.72439: 0.96,
+      7.76102: 0.97,
+      9.25404: 0.98,
+      11.8737: 0.99
+    }
+    const keys = Object.keys(probabilityTable).map((string) => (parseFloat(string)));
+    let left = 0;
+    let right = keys.length - 1;
+    while (left < right) {
+      const mid = Math.floor((left + right) / 2);
+      if (keys[mid] < a) {
+        left = mid + 1;
+      } else {
+        right = mid;
+      }
+    }
+    const closestKey = keys[right-1];
+    return probabilityTable[closestKey];
+  }
+
+  calculateRedWP = (pips) => {
+    const playerRPCS = this.calculateRPC(pips)
+    let x, y = 0
+    if (this.state.player1) {
+      console.log("--Player 1 Rolling--")
+      x = playerRPCS[0].rpc
+      y = playerRPCS[1].rpc
+    } else {
+      console.log("--Player 2 Rolling--")
+      x = playerRPCS[1].rpc
+      y = playerRPCS[0].rpc
+    }
+
+    console.log("X: ", x)
+    console.log("Y: ", y)
+    const a = x - 4
+    console.log("x - 4: ", a)
+    const b = y - a
+    console.log("y - a: ", b)
+    const delta = y - (x - 4)
+    console.log("Delta: ", delta)
+    const s = x + y
+    console.log("S: ", s)
+    const numerator = Math.pow(delta, 2) + (delta / 7)
+    const denominator = s - 24.7
+    let PI = numerator / denominator
+    if (PI < 0) {
+      PI = PI * -1
+    }
+    let probability = this.getClosestValue(PI)
+    if (x > y && probability > 0.5) {
+      probability = 1 - probability
+    }
+    console.log("Probability: ", probability)
+    if (!this.state.player1) {
+      probability = 1 - probability
+    }
+
+    return probability * 100
+  }
   // function responsible to give a new pip array without movable or receivable functions
   cleanPips = (pips) => {
     let newPips = pips.map((pip) => {
@@ -392,7 +524,7 @@ class Play extends Component {
     boxes[0].checkers = 0
     boxes[1].checkers = 0  
 
-    const redWP = 10
+    const redWP = 50
     this.setState({
       pips: pips,
       boxes: boxes,
