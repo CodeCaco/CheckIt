@@ -9,8 +9,10 @@ function HeroSection() {
         <h1>A NEW GAME AWAITS</h1>
         <p>What are you waiting for?</p>
         <div className="hero-btns">
-            <Button className='btns' buttonStyle='btn--outline' buttonSize='btn--large' whereTo='play'>Get Started</Button>
+            <Button className='btns' buttonStyle='btn--outline' buttonSize='btn--large' whereTo='play'>Local</Button>
+            <Button className='btns' buttonStyle='btn--outline' buttonSize='btn--large' whereTo='play2'>Online</Button>
         </div>
+        
     </div>
   )
 }
