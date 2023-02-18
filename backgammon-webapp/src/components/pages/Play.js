@@ -540,8 +540,9 @@ class Play extends Component {
         </div>
         <div className="playground">
           {this.state.test}
-          <Board state={this.state} player1={this.state.player1} rollDice={this.calculateRoll} dice={this.state.dice} clear={this.clearDice}/>
+          <Board state={this.state} player1={this.state.player1} rollDice={this.calculateRoll} dice={this.state.dice}/>
         </div>
+        <button onClick={this.clearDice}>clear</button>
         <button onClick={this.newGameSetup}>start</button>
         <button onClick={() => this.renderEndMenu(this.state.player1)}>test</button>
       </>

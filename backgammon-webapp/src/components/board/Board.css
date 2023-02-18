@@ -12,6 +12,7 @@
     bottom: 5%;
     top: 5%;
     background-image: url("../../assets/cloth.jpeg");
+    /* border: 0.1px solid transparent; */
     border-image: url('../../assets/leather.jpeg') 10% 30% / 10px 10px / 10px;
 }
 

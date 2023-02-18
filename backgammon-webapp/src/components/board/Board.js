@@ -111,7 +111,6 @@ const Board = (props) => {
         </div>
       </div>
       <CheckerBox box={props.state.boxes[1]} checker={handleBearedChecker(props.state.boxes[1].player, props.state.boxes[1].checkers)} side="right bottom">{rightDice}</CheckerBox>
-      <button onClick={props.clear}>Clear</button>
     </div>
   )
 }
