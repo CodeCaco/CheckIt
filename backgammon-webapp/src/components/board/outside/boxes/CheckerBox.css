@@ -32,6 +32,7 @@
     align-items: center;
     justify-content: center;
     display: flex;
+    z-index: 3;
 }
 
 .box-down {
@@ -47,5 +48,7 @@
 
 .box-receivable {
     background-color: rgba(0, 128, 0, 0.70);
+    width: 102%;
     cursor: pointer;
+    z-index: 2;
 }

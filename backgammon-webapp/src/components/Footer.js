@@ -3,7 +3,7 @@ import './Footer.css'
 
 function Footer() {
   return (
-    <footer> © 2022 | Made by Vasco Leitão </footer>
+    <div className="footer"> © 2022 | Made by Vasco Leitão </div>
   )
 }
 

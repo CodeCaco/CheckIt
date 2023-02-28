@@ -1,16 +1,56 @@
 import React, {Component} from 'react';
 import '../../App.css';
+import './Play.css';
+import 'chart.css'
 import Board from '../board/Board';
+import { ProgressBar } from '../board/ProgressBar';
+import { EndMenu } from '../menus/end-menu/EndMenu';
+
 
 class Play extends Component {
-  state = {
-    dice: [],
-    player1: true,
-    p1FirstChecker: 12,
-    p2FirstChecker: 11,
-    moving: false,
-    pips: Array(24).fill({player: null, checkers: 0}),
-    boxes: Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15}))
+  constructor(props) {
+    super(props);
+    console.log(props);
+    
+    this.state = {
+      dice: [],
+      player1: true,
+      p1FirstChecker: 12,
+      p2FirstChecker: 11,
+      moving: false,
+      pips: Array(24).fill({player: null, checkers: 0}),
+      p1Path: [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
+      p2Path: [11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+      boxes: Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15})),
+      redWP: 50,
+      redWPHistory: [],
+      test: null
+    }
+  }
+
+  newGameSetup = () => {
+    const pips = Array(24).fill({player: null, checkers: 0})
+
+    pips[12] = {player: 1, checkers: 15}
+    pips[11] = {player: 2, checkers: 15}
+
+    const boxes = Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15}))
+
+    boxes[0].checkers = 0
+    boxes[1].checkers = 0  
+
+    this.setState({
+      dice: [],
+      player1: true,
+      p1FirstChecker: 12,
+      p2FirstChecker: 11,
+      moving: false,
+      pips: pips,
+      boxes: boxes,
+      redWP: 50,
+      redWPHistory: [],
+      test: null
+    })
   }
 
   // function responsible for handling the roll of the dice
@@ -22,6 +62,7 @@ class Play extends Component {
       dice.push(Math.floor(Math.random() * 6) +1)
     }
 
+    // dice = [6, 6]
     // if both die rolls are the same, then double it (FEVGA rule)
     if (dice[0] === dice[1]) {
       for (let i = 0; i < 2; i++) {
@@ -51,7 +92,7 @@ class Play extends Component {
     // for both players specify it's path and which pips have checkers that are allowed to move
     if (this.state.player1) {
       // this array is responsible for the pip path each player follows
-      pipPath = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+      pipPath = this.state.p1Path
 
       // if the first checker still hasn't moved from starting table, only find the pip of that first checker
       if (firstCheckerIndex !== false) {
@@ -62,7 +103,7 @@ class Play extends Component {
       }
     } else {
       // this array is responsible for the pip path each player follows
-      pipPath = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+      pipPath = this.state.p2Path
 
       // if the first checker still hasn't moved from starting table, only find the pip of that first checker
       if (firstCheckerIndex !== false) {
@@ -181,7 +222,7 @@ class Play extends Component {
     if (this.state.player1) {
       firstCheckerIndex = this.state.p1FirstChecker
       if (firstCheckerIndex !== false) {
-        if (index < 18) {
+        if (index < 24 && index > 11) {
           firstCheckerIndex = index
         } else {
           firstCheckerIndex = false
@@ -190,7 +231,7 @@ class Play extends Component {
     } else {
       firstCheckerIndex = this.state.p2FirstChecker
       if (firstCheckerIndex !== false) {
-        if (index > 5) {
+        if (index < 12) {
           firstCheckerIndex = index
         } else {
           firstCheckerIndex = false
@@ -223,6 +264,7 @@ class Play extends Component {
       // check if game has ended by having 15 checkers in the checker box
       if (boxes[player - 1].checkers === 15) {
         console.log("Game Ended")
+        this.renderEndMenu(this.state.player1)
       }
     } else {
       // add a checker to the destination pip & update the pip's player occupation to that of the checker owner
@@ -243,12 +285,16 @@ class Play extends Component {
       player = !this.state.player1
     }
 
+    const redWP = this.calculateRedWP(pips)
+    this.state.redWPHistory.push(redWP)
+
     this.setState({
       dice: dice,
       pips: pips,
       player1: player,
       moving: moving,
-      boxes: boxes
+      boxes: boxes,
+      redWP: redWP
     })
     if (this.state.player1) {
       this.setState({
@@ -334,6 +380,122 @@ class Play extends Component {
     return {canBearOff: canBearOff, bearableDie: bearableDie}
   }
 
+  calculateRPC = (pips) => {
+    let playerRPCS = Array(2).fill().map((_, i) => ({player: i + 1, rpc: 0}))
+
+    playerRPCS.forEach((player, i) => {
+      const pipPath = player.player === 1 ? this.state.p1Path : this.state.p2Path
+      const playerPips = pips.filter(pip => pip.player === player.player)
+      playerPips.forEach((pip) => {
+        const originIndex = pips.findIndex(p => p === pip)
+        const pathOriginIndex = pipPath.findIndex(p => p === originIndex)
+        const remainingPath = (pipPath.length) - pathOriginIndex
+        playerRPCS[i].rpc += remainingPath * pip.checkers
+      })
+    })
+    return playerRPCS
+  }
+
+  getClosestValue = (a) => {
+    if (a === 0) {
+      return 0.5
+    }
+    const probabilityTable = {
+      0: 0.5,
+      0.00137882: 0.51,
+      0.00551875: 0.52,
+      0.0124302: 0.53,
+      0.0221307: 0.54,
+      0.0346450: 0.55,
+      0.0500050: 0.56,
+      0.0682506: 0.57,
+      0.0894296: 0.58,
+      0.113598: 0.59,
+      0.140821: 0.6,
+      0.171174: 0.61,
+      0.204741: 0.62,
+      0.241618: 0.63,
+      0.281913: 0.64,
+      0.325747: 0.65,
+      0.373256: 0.66,
+      0.424591: 0.67,
+      0.479920: 0.68,
+      0.539433: 0.69,
+      0.603341: 0.7,
+      0.671879: 0.71,
+      0.745311: 0.72,
+      0.823934: 0.73,
+      0.908082: 0.74,
+      0.998131: 0.75,
+      1.09451: 0.76,
+      1.19769: 0.77,
+      1.30824: 0.78,
+      1.42679: 0.79,
+      1.55407: 0.8,
+      1.69092: 0.81,
+      1.83834: 0.82,
+      1.99749: 0.83,
+      2.16975: 0.84,
+      2.35678: 0.85,
+      2.56060: 0.86,
+      2.78365: 0.87,
+      3.02902: 0.88,
+      3.30059: 0.89,
+      3.60337: 0.9,
+      3.94399: 0.91,
+      4.33145: 0.92,
+      4.77844: 0.93,
+      5.30360: 0.94,
+      5.93596: 0.95,
+      6.72439: 0.96,
+      7.76102: 0.97,
+      9.25404: 0.98,
+      11.8737: 0.99
+    }
+    const keys = Object.keys(probabilityTable).map((string) => (parseFloat(string)));
+    let left = 0;
+    let right = keys.length - 1;
+    while (left < right) {
+      const mid = Math.floor((left + right) / 2);
+      if (keys[mid] < a) {
+        left = mid + 1;
+      } else {
+        right = mid;
+      }
+    }
+    const closestKey = keys[right-1];
+    return probabilityTable[closestKey];
+  }
+
+  calculateRedWP = (pips) => {
+    const playerRPCS = this.calculateRPC(pips)
+    let x, y = 0
+    if (this.state.player1) {
+      x = playerRPCS[0].rpc
+      y = playerRPCS[1].rpc
+    } else {
+      x = playerRPCS[1].rpc
+      y = playerRPCS[0].rpc
+    }
+
+    const delta = y - (x - 4)
+    const s = x + y
+    const numerator = Math.pow(delta, 2) + (delta / 7)
+    const denominator = s - 24.7
+    let PI = numerator / denominator
+    if (PI < 0) {
+      PI = PI * -1
+    }
+    let probability = this.getClosestValue(PI)
+    if (x > y && probability > 0.5) {
+      probability = 1 - probability
+    }
+    if (!this.state.player1) {
+      probability = 1 - probability
+    }
+
+    return probability * 100
+  }
   // function responsible to give a new pip array without movable or receivable functions
   cleanPips = (pips) => {
     let newPips = pips.map((pip) => {
@@ -361,50 +523,32 @@ class Play extends Component {
     })
   }
 
-  setCheckers = () => {
-    const pips = [...this.state.pips]
+  renderEndMenu = (winner) => {
+    const winnerString = winner ? "Player 1" : "Player 2"
+    const height = document.getElementsByClassName("progress")[0].clientHeight + document.getElementsByClassName("playground")[0].clientHeight
+    const width = window.innerWidth
+    const table = (<EndMenu height={height} winnerString={winnerString} width={width} data={this.state.redWPHistory}/>)
 
-    pips[12] = {player: 1, checkers: 15}
-
-    // // bearing off test setup
-    // pips[0] = {player: 1, checkers: 2}
-    // pips[1] = {player: 1, checkers: 2}
-    // pips[2] = {player: 1, checkers: 2}
-    // pips[3] = {player: 1, checkers: 3}
-    // pips[4] = {player: 1, checkers: 5}
-
-    pips[11] = {player: 2, checkers: 15}
-
-    // // bearing off test setup
-    // pips[23] = {player: 2, checkers: 2}
-    // pips[22] = {player: 2, checkers: 2}
-    // pips[21] = {player: 2, checkers: 2}
-    // pips[20] = {player: 2, checkers: 3}
-    // pips[19] = {player: 2, checkers: 5}
-   
-
-
-    const boxes = [...this.state.boxes]
-
-    boxes[0].checkers = 0
-    boxes[1].checkers = 0  
-
-
-    this.setState({
-      pips: pips,
-      boxes: boxes
-    })
+  this.setState({
+    test: table
+  })
   }
 
   render() {
   return (
       <>
-        <div className="playground">
-          <Board state={this.state} player1={this.state.player1} rollDice={this.calculateRoll} dice={this.state.dice} clear={this.clearDice}/>
+        <div className="progress">
+          <ProgressBar redWP={this.state.redWP}></ProgressBar>
         </div>
-        <button onClick={this.setCheckers}>start</button>
+        <div className="playground">
+          {this.state.test}
+          <Board state={this.state} player1={this.state.player1} rollDice={this.calculateRoll} dice={this.state.dice}/>
+        </div>
+        <button onClick={this.clearDice}>clear</button>
+        <button onClick={this.newGameSetup}>start</button>
+        <button onClick={() => this.renderEndMenu(this.state.player1)}>test</button>
       </>
     );
 }
 }
-export default Play
+export default Play;
