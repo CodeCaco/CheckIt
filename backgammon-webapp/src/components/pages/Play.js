@@ -6,10 +6,12 @@ import Board from '../board/Board';
 import { ProgressBar } from '../board/ProgressBar';
 import { EndMenu } from '../menus/end-menu/EndMenu';
 
+
 class Play extends Component {
   constructor(props) {
-    super(props)
-    console.log(props)
+    super(props);
+    console.log(props);
+    
     this.state = {
       dice: [],
       player1: true,
@@ -549,4 +551,4 @@ class Play extends Component {
     );
 }
 }
-export default Play
+export default Play;

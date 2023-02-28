@@ -7,7 +7,8 @@ import LocalMenu from './components/menus/LocalMenu';
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import Footer from './components/Footer';
 
-function App() {
+function App(props) {
+  console.log("THIS IS APP.JS: ", props)
   return (
     <>
     <Router>
@@ -15,8 +16,8 @@ function App() {
       <Routes>
         <Route path='/' exact element={<Home />}/>
         <Route path='/localMenu' element={<LocalMenu />}/>
-        <Route path='/localPlay' element={<Play test="abc"/>}/>
-        <Route path='/play2' element={<Play test="123"/>}/>
+        <Route path='/localPlay' element={<Play test="123"/>}/>
+        <Route path='/play2' element={<Play />}/>
       </Routes>
       <Footer />
     </Router>

@@ -6,8 +6,8 @@ export const Graph = (props) => {
 
     return (
         <>
-            <table className="charts-css area show-heading" id="my-chart">
-                <caption>Win Probabilities</caption>
+            <table className="charts-css area show-heading graph-area" id="my-chart">
+                <caption className="caption">Win Probabilities</caption>
                 <tbody>
                     {props.data.map((percentage, i) => {
                         if (i === 0) {
