@@ -1,17 +1,29 @@
 const express = require('express')
 const http = require('http')
 const socketio = require('socket.io')
+const cookie = require('cookie')
+const online = require('./online')
 
 const app = express()
 
 
 const server = http.createServer(app)
 const io = socketio(server)
-// run when client connects
 
+
+// run when client connects
 io.on('connection', client => {
-    console.log("A papaya esta ligada")
+
+    online.gameInit(io, client)
+
+    client.on('connection', name => {
+        client.name = name;
+        console.log(`Client connected with id ${client.id}`);
+    });
 })
 
+const PORT = process.env.PORT || 3001;
 
-server.listen(process.env.PORT || 8000)
+server.listen(PORT, () => {
+    console.log(`Server listening on ${PORT}`);
+});
