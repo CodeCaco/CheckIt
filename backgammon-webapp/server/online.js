@@ -74,6 +74,8 @@ class Game {
 
         // find the available moves after the roll of the dice
         const firstCheckerIndex = this.state.player1 ? this.state.p1FirstChecker : this.state.p2FirstChecker
+
+        console.log(this.state.p2FirstChecker)
         const moves = this.findMoves(pips, dice, firstCheckerIndex, boxes)
 
         this.state.dice = dice
@@ -210,6 +212,7 @@ class Game {
     // function responsible for performing the necessary steps when a user clicks on a destination pip to move a checker to it
     receiverClick = (index, die) => {
         let firstCheckerIndex = false
+        console.log(this.state.p2FirstChecker)
 
         // update the state of the first checker depending on whether or not it crossed to the opposing table
         if (this.state.player1) {
@@ -227,11 +230,10 @@ class Game {
                 if (index < 12) {
                     firstCheckerIndex = index
                 } else {
-                    irstCheckerIndex = false
+                    firstCheckerIndex = false
                 }
             }
         }
-
         let pips = this.cleanPips(this.state.pips)
         let boxes = this.cleanBoxes(this.state.boxes)
 
@@ -281,6 +283,12 @@ class Game {
         const redWP = this.calculateRedWP(pips)
         this.state.redWPHistory.push(redWP)
 
+        if (this.state.player1) {
+            this.state.p1FirstChecker = firstCheckerIndex
+        } else {
+            this.state.p2FirstChecker = firstCheckerIndex
+        }
+
         this.state.dice = dice
         this.state.pips = pips
         this.state.player1 = player
@@ -288,11 +296,7 @@ class Game {
         this.state.boxes = boxes
         this.state.redWP = redWP
 
-        if (this.state.player1) {
-            this.state.p1FirstChecker = firstCheckerIndex
-        } else {
-            this.state.p2FirstChecker = firstCheckerIndex
-        }
+        console.log(this.state.p2FirstChecker)
     }
     
     // function that iterates through the last table and sees if user has all the checkers in it meaning it can start bearing off pieces
