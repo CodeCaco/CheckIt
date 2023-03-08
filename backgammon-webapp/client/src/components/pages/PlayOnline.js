@@ -32,13 +32,75 @@ class PlayOnline extends Component {
     this.socket.on('update-state', state => {
       this.setState(state)
     })
+
+    this.socket.on('calculate-roll', state => {
+      state.pips.forEach((pip,i) => {
+        if ("movable" in pip) {
+          const [originIndex, pipPath, firstCheckerIndex] = pip.movable
+          state.pips[i].movable = this.checkerClick.bind(this, originIndex, pipPath, firstCheckerIndex)
+        }
+      })
+      this.setState(state)
+    })
+
+    this.socket.on('click-update-state', state => {
+      state.pips.forEach((pip,i) => {
+        if ("movable" in pip) {
+          const [originIndex, pipPath, firstCheckerIndex] = pip.movable
+          state.pips[i].movable = this.checkerClick.bind(this, originIndex, pipPath, firstCheckerIndex)
+        }
+        if ("receivable" in pip) {
+          const [index, die] = pip.receivable
+          state.pips[i].receivable = this.receiverClick.bind(this, index, die)
+        }
+      })
+      state.boxes.forEach((pip,i) => {
+        if ("receivable" in pip) {
+          const [index, die] = pip.receivable
+          state.pips[i].receivable = this.receiverClick.bind(this, index, die)
+        }
+      })
+      this.setState(state)
+      console.log(state)
+    })
+
+    const rollDie = document.getElementById("rollDie")
+    if (rollDie !== null) {
+      rollDie.addEventListener('click', () => {
+        this.socket.emit("dice-click")
+      })
+    }
+  }
+  
+  componentDidUpdate() {
+    const rollDieRemove = document.getElementById("rollDie")
+    if (rollDieRemove !== null) {
+      rollDieRemove.removeEventListener('click', () => {
+        this.socket.emit("dice-click")
+      })
+    }
+  
+    const rollDieAdd = document.getElementById("rollDie")
+    if (rollDieAdd !== null) {
+      rollDieAdd.addEventListener('click', () => {
+        this.socket.emit("dice-click")
+      })
+    }
+  }
+
+  checkerClick = (originIndex, pipPath, firstCheckerIndex) => {
+    this.socket.emit("checker-click", originIndex, pipPath, firstCheckerIndex)
+  }
+
+  // function responsible for performing the necessary steps when a user clicks on a destination pip to move a checker to it
+  receiverClick = (index, die) => {
+    this.socket.emit("receiver-click", index, die)
   }
 
   test = () => {
-    console.log("estamos dentro da class")
-    
-    this.socket.emit("test")
+    console.log(this.state.pips)
   }
+
   render() {
   return (
       <>

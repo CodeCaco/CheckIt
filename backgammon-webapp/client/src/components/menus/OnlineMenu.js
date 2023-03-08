@@ -23,7 +23,6 @@ function OnlineMenu() {
   });
 
   socket.on('game-start', () => {
-    console.log("Papaya funciona")
     setWaitingPlayer(false)
   })
 

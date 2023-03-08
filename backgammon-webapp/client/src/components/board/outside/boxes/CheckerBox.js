@@ -21,13 +21,13 @@ export const CheckerBox = (props) => {
         <>
             <div className={`counter ${props.side}`}>Checkers: {props.box.checkers}</div>
             <div className={`outside-column ${props.side}`}>
-                <div className={`box-up ${upReceivable}`} onClick={upClick}>
+                <div id="destinationClick" className={`box-up ${upReceivable}`} onClick={upClick}>
                     {up}
                 </div>
                 <div className="box-middle">
                     {props.children}
                 </div>
-                <div className={`box-down ${downReceivable}`} onClick={downClick}>
+                <div id="destinationClick" className={`box-down ${downReceivable}`} onClick={downClick}>
                     {down}
                 </div>
             </div>

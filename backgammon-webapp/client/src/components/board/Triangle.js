@@ -19,8 +19,8 @@ export const Triangle = (props) => {
     const checkSpan = props.pip.checkers <= 3 ? "double-span" : ""
     return (
         <>
-            <div className={`tri-column ${[checkMovable]}`} onClick={checkMovableOnClick}>
-                <div className={`tri ${checkTriangleStyle} ${checkTriangleOrientation} ${[checkReceivable]}`} onClick={checkReceivableOnClick}></div>
+            <div id="checkerClick" className={`tri-column ${[checkMovable]}`} onClick={checkMovableOnClick}>
+                <div id="destinationClick" className={`tri ${checkTriangleStyle} ${checkTriangleOrientation} ${[checkReceivable]}`} onClick={checkReceivableOnClick}></div>
                 <div className={`checkers-column ${checkSpan}`}>
                     {props.children}
                 </div>
