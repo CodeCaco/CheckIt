@@ -2,12 +2,10 @@ import React from 'react';
 import './Graph.css';
 
 export const Graph = (props) => {
-    console.log(props.data.length)
 
     return (
         <>
-            <table className="charts-css area show-heading graph-area" id="my-chart">
-                <caption className="caption">Win Probabilities</caption>
+            <table className="charts-css area graph-area" id="my-chart">
                 <tbody>
                     {props.data.map((percentage, i) => {
                         if (i === 0) {

@@ -8,7 +8,8 @@ var gameSocket
 var currentSessions = []
 
 class Game {
-    constructor() {
+    constructor(creator) {
+        this.creator = creator
         this.state = {
             dice: [],
             player1: true,
@@ -21,7 +22,8 @@ class Game {
             boxes: Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15})),
             redWP: 50,
             redWPHistory: [],
-            finalTable: null
+            toggleFinalTable: false,
+            toggleNoMoves: false
         }
     }
 
@@ -48,7 +50,8 @@ class Game {
             boxes: boxes,
             redWP: 50,
             redWPHistory: [],
-            finalTable: null
+            toggleFinalTable: false,
+            toggleNoMoves: null
         }
     }
 
@@ -75,8 +78,13 @@ class Game {
         // find the available moves after the roll of the dice
         const firstCheckerIndex = this.state.player1 ? this.state.p1FirstChecker : this.state.p2FirstChecker
 
-        console.log(this.state.p2FirstChecker)
         const moves = this.findMoves(pips, dice, firstCheckerIndex, boxes)
+
+        if ("noMoves" in moves) {
+            dice = []
+            this.state.player1 = !this.state.player1
+            this.state.toggleNoMoves = true
+        }
 
         this.state.dice = dice
         this.state.pips = moves.pips
@@ -149,7 +157,7 @@ class Game {
 
         // check if there are not more moves available
         if (!foundMoves) {
-        console.log("No Moves Available")
+            return {pips: newPips, noMoves: true}
         }
         return {pips: newPips}
     }
@@ -212,7 +220,6 @@ class Game {
     // function responsible for performing the necessary steps when a user clicks on a destination pip to move a checker to it
     receiverClick = (index, die) => {
         let firstCheckerIndex = false
-        console.log(this.state.p2FirstChecker)
 
         // update the state of the first checker depending on whether or not it crossed to the opposing table
         if (this.state.player1) {
@@ -258,8 +265,7 @@ class Game {
 
             // check if game has ended by having 15 checkers in the checker box
             if (boxes[player - 1].checkers === 15) {
-                console.log("Game Ended")
-                // this.renderEndMenu(this.state.player1)
+                this.state.toggleFinalTable = true
             }
         } else {
             // add a checker to the destination pip & update the pip's player occupation to that of the checker owner
@@ -271,14 +277,22 @@ class Game {
         const dieIndex = dice.findIndex(d => d === die)
         dice.splice(dieIndex, 1)
 
-        // check if player still has moves left to perform, if not switch players
+         // check if player still has moves left to perform, if not switch players
+
         if (dice.length !== 0) {
             const moves = this.findMoves(pips, dice, firstCheckerIndex, boxes);
             pips = moves.pips;
             player = this.state.player1
+
+            if ("noMoves" in moves) {
+                dice = []
+                player = !this.state.player1
+                this.state.toggleNoMoves = true
+            }
         } else {
             player = !this.state.player1
         }
+
 
         const redWP = this.calculateRedWP(pips)
         this.state.redWPHistory.push(redWP)
@@ -295,8 +309,6 @@ class Game {
         this.state.moving = moving
         this.state.boxes = boxes
         this.state.redWP = redWP
-
-        console.log(this.state.p2FirstChecker)
     }
     
     // function that iterates through the last table and sees if user has all the checkers in it meaning it can start bearing off pieces
@@ -513,7 +525,6 @@ const gameInit = (sio, ssocket) => {
 
     gameSocket.on('disconnect', () => {
         var game = currentSessions.indexOf(gameSocket)
-        // console.log(game)
         currentSessions.splice(game, 1) 
     })
 
@@ -538,10 +549,14 @@ function gameStart(socketID) {
 
 function diceClick() {
     const {game, room} = findGameAndRoom(this.id)
-
     if (verifyClicker(game.state.player1, room.creator, this.id)) {
         game.calculateRoll()
         this.emit("calculate-roll", game.state)
+
+        if (game.state.toggleNoMoves) {
+            this.emit("render-no-moves")
+            game.state.toggleNoMoves = false
+        }
 
         const state = cleanState(game)
         this.to(`room-${room.id}`).emit("update-state", state)
@@ -562,8 +577,17 @@ function handleReceiverClick(index, die) {
         game.receiverClick(index, die)
         this.emit("click-update-state", game.state)
 
+        if (game.state.toggleNoMoves) {
+            this.emit("render-no-moves")
+            game.state.toggleNoMoves = false
+        }
+
         const state = cleanState(game)
         this.to(`room-${room.id}`).emit("update-state", state)
+
+        if (game.state.toggleFinalTable) {
+            io.to(`room-${room.id}`).emit("render-end-menu", game.state.player1)
+        }
     }
 }
 /* --------------------------------- */
@@ -583,7 +607,7 @@ function verifyClicker(player, creator, socketID) {
 
 function findGameAndRoom(socketID) {
     const room = currentSessions.find(room => room.players.includes(socketID));
-    const game = currentSessions.find(room => room.id.includes(room.id)).game
+    const game = currentSessions.find(r => r.id === room.id).game
     return {game: game, room: room}
 }
 
@@ -591,7 +615,7 @@ function createRoom(socketID) {
     const room = {
         id: uuidv4(),
         players: [],
-        game: new Game(),
+        game: new Game(socketID),
         creator: socketID
       };
     currentSessions.push(room);
@@ -599,22 +623,22 @@ function createRoom(socketID) {
 }
 
 
-async function findGame() {
-    let room = currentSessions.find(room => room.players.length < 2)
+function findGame() {
+    const room = currentSessions.find(room => room.players.length < 2)
 
     if (room) {
         room.players.push(this.id)
         this.join(`room-${room.id}`)
         console.log(`Player ${this.id} joined room ${room.id}`);
 
-        await io.to(`room-${room.id}`).emit("game-start")
+        io.to(`room-${room.id}`).emit("game-start")
         gameStart(this.id)
     } else {
         // Create a new room and join it
-        const room = createRoom(this.id);
-        room.players.push(this.id);
-        this.join(`room-${room.id}`);
-        console.log(`Player ${this.id} created and joined room ${room.id}`);
+        const newRoom = createRoom(this.id);
+        newRoom.players.push(this.id);
+        this.join(`room-${newRoom.id}`);
+        console.log(`Player ${this.id} created and joined room ${newRoom.id}`);
     }
 }
 

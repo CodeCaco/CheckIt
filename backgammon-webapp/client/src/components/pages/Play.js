@@ -5,12 +5,12 @@ import 'chart.css'
 import Board from '../board/Board';
 import { ProgressBar } from '../board/ProgressBar';
 import { EndMenu } from '../menus/end-menu/EndMenu';
+import { NoMoves } from '../board/outside/dice/NoMoves';
 
 
 class Play extends Component {
   constructor(props) {
     super(props);
-    console.log(props);
     
     this.state = {
       dice: [],
@@ -24,7 +24,8 @@ class Play extends Component {
       boxes: Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15})),
       redWP: 50,
       redWPHistory: [],
-      test: null
+      finalTable: null,
+      noMoves: null
     }
   }
 
@@ -49,7 +50,7 @@ class Play extends Component {
       boxes: boxes,
       redWP: 50,
       redWPHistory: [],
-      test: null
+      finalTable: null
     })
   }
 
@@ -77,10 +78,20 @@ class Play extends Component {
     // find the available moves after the roll of the dice
     const firstCheckerIndex = this.state.player1 ? this.state.p1FirstChecker : this.state.p2FirstChecker
     const moves = this.findMoves(pips, dice, firstCheckerIndex, boxes)
+    
+    if ("noMoves" in moves) {
+      dice = []
+      const height = document.getElementsByClassName("progress")[0].clientHeight + document.getElementsByClassName("playground")[0].clientHeight
+      const width = window.innerWidth
+      this.setState({
+        noMoves: <NoMoves onClick={this.renderNoMoves} height={height} width={width}/>,
+        player1: !this.state.player1
+      })
+    }
 
     this.setState({
       dice: dice,
-      pips: moves.pips
+      pips: moves.pips,
     })
   }
 
@@ -152,7 +163,7 @@ class Play extends Component {
 
     // check if there are not more moves available
     if (!foundMoves) {
-      console.log("No Moves Available")
+      return {pips: newPips, noMoves: true}
     }
     return {pips: newPips}
   }
@@ -265,6 +276,7 @@ class Play extends Component {
       if (boxes[player - 1].checkers === 15) {
         console.log("Game Ended")
         this.renderEndMenu(this.state.player1)
+        return
       }
     } else {
       // add a checker to the destination pip & update the pip's player occupation to that of the checker owner
@@ -277,10 +289,21 @@ class Play extends Component {
     dice.splice(dieIndex, 1)
 
     // check if player still has moves left to perform, if not switch players
+
     if (dice.length !== 0) {
       const moves = this.findMoves(pips, dice, firstCheckerIndex, boxes);
       pips = moves.pips;
       player = this.state.player1
+
+      if ("noMoves" in moves) {
+        dice = []
+        player = !this.state.player1
+        const height = document.getElementsByClassName("progress")[0].clientHeight + document.getElementsByClassName("playground")[0].clientHeight
+        const width = window.innerWidth
+        this.setState({
+          noMoves: <NoMoves onClick={this.renderNoMoves} height={height} width={width}/>
+        })
+      }
     } else {
       player = !this.state.player1
     }
@@ -523,6 +546,12 @@ class Play extends Component {
     })
   }
 
+  renderNoMoves = () => {
+    this.setState({
+      noMoves: null
+    })
+  }
+
   renderEndMenu = (winner) => {
     const winnerString = winner ? "Player 1" : "Player 2"
     const height = document.getElementsByClassName("progress")[0].clientHeight + document.getElementsByClassName("playground")[0].clientHeight
@@ -530,7 +559,7 @@ class Play extends Component {
     const table = (<EndMenu height={height} winnerString={winnerString} width={width} data={this.state.redWPHistory}/>)
 
   this.setState({
-    test: table
+    finalTable: table
   })
   }
 
@@ -541,7 +570,8 @@ class Play extends Component {
           <ProgressBar redWP={this.state.redWP}></ProgressBar>
         </div>
         <div className="playground">
-          {this.state.test}
+          {this.state.finalTable}
+          {this.state.noMoves}
           <Board state={this.state} player1={this.state.player1} rollDice={this.calculateRoll} dice={this.state.dice}/>
         </div>
         <button onClick={this.clearDice}>clear</button>

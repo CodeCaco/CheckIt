@@ -9,7 +9,7 @@
   --textColour: #EAEAEA;
   --textSecondaryColour: hsl(0, 0%, 80%);
   --textShadow: 0 .1rem 0 rgba(0,0,0,.4);
-  --attentionColour: #F08700;
+  --attentionColour: hsl(34, 100%, 47%);
   --attentionColourLower: hsl(34, 100%, 38%);
   --attentionColourHigher: hsl(34, 100%, 56%);
   --attentionAccentColour: #FFF585;

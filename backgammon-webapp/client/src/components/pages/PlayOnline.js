@@ -5,6 +5,7 @@ import 'chart.css'
 import Board from '../board/Board';
 import { ProgressBar } from '../board/ProgressBar';
 import { EndMenu } from '../menus/end-menu/EndMenu';
+import { NoMoves } from '../board/outside/dice/NoMoves';
 
 class PlayOnline extends Component {
 
@@ -24,7 +25,8 @@ class PlayOnline extends Component {
       boxes: Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15})),
       redWP: 50,
       redWPHistory: [],
-      finalTable: null
+      finalTable: null,
+      noMoves: null
     }
   }
 
@@ -54,14 +56,18 @@ class PlayOnline extends Component {
           state.pips[i].receivable = this.receiverClick.bind(this, index, die)
         }
       })
-      state.boxes.forEach((pip,i) => {
-        if ("receivable" in pip) {
-          const [index, die] = pip.receivable
-          state.pips[i].receivable = this.receiverClick.bind(this, index, die)
+      state.boxes.forEach((boxes,i) => {
+        if ("receivable" in boxes) {
+          const [index, die] = boxes.receivable
+          state.boxes[i].receivable = this.receiverClick.bind(this, index, die)
         }
       })
       this.setState(state)
-      console.log(state)
+    })
+
+    this.socket.on("render-no-moves", this.renderNoMoves)
+    this.socket.on("render-end-menu", winner => {
+      this.renderEndMenu(winner)
     })
 
     const rollDie = document.getElementById("rollDie")
@@ -97,8 +103,29 @@ class PlayOnline extends Component {
     this.socket.emit("receiver-click", index, die)
   }
 
-  test = () => {
-    console.log(this.state.pips)
+  renderNoMoves = () => {
+    const height = document.getElementsByClassName("progress")[0].clientHeight + document.getElementsByClassName("playground")[0].clientHeight
+    const width = window.innerWidth
+    this.setState({
+      noMoves: <NoMoves onClick={this.toggleNoMoves} height={height} width={width}/>,
+    })
+  }
+
+  toggleNoMoves = () => {
+    this.setState({
+      noMoves: null
+    })
+  }
+
+  renderEndMenu = (winner) => {
+    const winnerString = winner ? "Player 1" : "Player 2"
+    const height = document.getElementsByClassName("progress")[0].clientHeight + document.getElementsByClassName("playground")[0].clientHeight
+    const width = window.innerWidth
+    const table = (<EndMenu height={height} winnerString={winnerString} width={width} data={this.state.redWPHistory}/>)
+
+    this.setState({
+      finalTable: table
+    })
   }
 
   render() {
@@ -109,9 +136,10 @@ class PlayOnline extends Component {
         </div>
         <div className="playground">
           {this.state.finalTable}
+          {this.state.noMoves}
           <Board state={this.state} player1={this.state.player1} rollDice={this.calculateRoll} dice={this.state.dice}/>
         </div>
-        <button onClick={this.test}>clear</button>
+        {/* <button onClick={this.test}>clear</button> */}
         {/* <button onClick={this.newGameSetup}>start</button>
         <button onClick={() => this.renderEndMenu(this.state.player1)}>test</button> */}
       </>
