@@ -63,7 +63,6 @@ class Play extends Component {
       dice.push(Math.floor(Math.random() * 6) +1)
     }
 
-    // dice = [6, 6]
     // if both die rolls are the same, then double it (FEVGA rule)
     if (dice[0] === dice[1]) {
       for (let i = 0; i < 2; i++) {

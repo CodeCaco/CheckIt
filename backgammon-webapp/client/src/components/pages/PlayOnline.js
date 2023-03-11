@@ -11,6 +11,7 @@ class PlayOnline extends Component {
 
   constructor(props) {
     super(props)
+    this.isRandom = props.isRandom
     this.socket = require('../../connection').socket
 
     this.state = {
@@ -73,7 +74,7 @@ class PlayOnline extends Component {
     const rollDie = document.getElementById("rollDie")
     if (rollDie !== null) {
       rollDie.addEventListener('click', () => {
-        this.socket.emit("dice-click")
+        this.socket.emit("dice-click", this.isRandom)
       })
     }
   }
@@ -82,25 +83,25 @@ class PlayOnline extends Component {
     const rollDieRemove = document.getElementById("rollDie")
     if (rollDieRemove !== null) {
       rollDieRemove.removeEventListener('click', () => {
-        this.socket.emit("dice-click")
+        this.socket.emit("dice-click", this.isRandom)
       })
     }
   
     const rollDieAdd = document.getElementById("rollDie")
     if (rollDieAdd !== null) {
       rollDieAdd.addEventListener('click', () => {
-        this.socket.emit("dice-click")
+        this.socket.emit("dice-click", this.isRandom)
       })
     }
   }
 
   checkerClick = (originIndex, pipPath, firstCheckerIndex) => {
-    this.socket.emit("checker-click", originIndex, pipPath, firstCheckerIndex)
+    this.socket.emit("checker-click", originIndex, pipPath, firstCheckerIndex, this.isRandom)
   }
 
   // function responsible for performing the necessary steps when a user clicks on a destination pip to move a checker to it
   receiverClick = (index, die) => {
-    this.socket.emit("receiver-click", index, die)
+    this.socket.emit("receiver-click", index, die, this.isRandom)
   }
 
   renderNoMoves = () => {

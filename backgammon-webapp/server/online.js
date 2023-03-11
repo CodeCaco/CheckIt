@@ -1,11 +1,10 @@
-const { json } = require('express');
-const { Component } = require('react');
-const socket = require('socket.io-client/lib/socket');
 const { v4: uuidv4 } = require('uuid');
 
 var io
 var gameSocket
 var currentSessions = []
+var codedSessions = []
+var codesUsed = []
 
 class Game {
     constructor(creator) {
@@ -30,19 +29,19 @@ class Game {
     newGameSetup = () => {
         const pips = Array(24).fill({player: null, checkers: 0})
 
-        pips[12] = {player: 1, checkers: 15}
-        pips[11] = {player: 2, checkers: 15}
+        pips[12] = {player: 1, checkers: 1}
+        pips[11] = {player: 2, checkers: 1}
 
         const boxes = Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15}))
 
-        boxes[0].checkers = 0
-        boxes[1].checkers = 0  
+        boxes[0].checkers = 14
+        boxes[1].checkers = 14 
 
         this.state = {
             dice: [],
             player1: true,
-            p1FirstChecker: 12,
-            p2FirstChecker: 11,
+            p1FirstChecker: false,
+            p2FirstChecker: false,
             moving: false,
             pips: pips,
             p1Path: [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
@@ -266,6 +265,7 @@ class Game {
             // check if game has ended by having 15 checkers in the checker box
             if (boxes[player - 1].checkers === 15) {
                 this.state.toggleFinalTable = true
+                this.state.winner = this.state.player1
             }
         } else {
             // add a checker to the destination pip & update the pip's player occupation to that of the checker owner
@@ -523,10 +523,13 @@ const gameInit = (sio, ssocket) => {
 
     gameSocket.on('find-game', findGame)
 
+    gameSocket.on('create-game', createGame)
+
+    gameSocket.on('join-game', joinGame)
+
     gameSocket.on('disconnect', () => {
-        var game = currentSessions.indexOf(gameSocket)
-        currentSessions.splice(game, 1) 
-    })
+        // console.log("This socket ", gameSocket.id, " has disconnected")
+    }) 
 
     gameSocket.on("dice-click", diceClick)
 
@@ -539,16 +542,16 @@ const gameInit = (sio, ssocket) => {
 /*            Game Logic             */
 /* --------------------------------- */
 
-function gameStart(socketID) {
-    const {game, room} = findGameAndRoom(socketID)
+function gameStart(socketID, isRandom) {
+    const {game, room} = findGameAndRoom(socketID, isRandom)
     const roomName = "room-" + room.id
 
     game.newGameSetup()
     io.to(roomName).emit("update-state", game.state)
 }
 
-function diceClick() {
-    const {game, room} = findGameAndRoom(this.id)
+function diceClick(isRandom) {
+    const {game, room} = findGameAndRoom(this.id, isRandom)
     if (verifyClicker(game.state.player1, room.creator, this.id)) {
         game.calculateRoll()
         this.emit("calculate-roll", game.state)
@@ -563,16 +566,16 @@ function diceClick() {
     }
 }
 
-function handleCheckerClick(originIndex, pipPath, firstCheckerIndex) {
-    const {game, room} = findGameAndRoom(this.id)
+function handleCheckerClick(originIndex, pipPath, firstCheckerIndex, isRandom) {
+    const {game, room} = findGameAndRoom(this.id, isRandom)
     if (verifyClicker(game.state.player1, room.creator, this.id)) {
         game.checkerClick(originIndex, pipPath, firstCheckerIndex)
         this.emit("click-update-state", game.state)
     }
 }
 
-function handleReceiverClick(index, die) {
-    const {game, room} = findGameAndRoom(this.id)
+function handleReceiverClick(index, die, isRandom) {
+    const {game, room} = findGameAndRoom(this.id, isRandom)
     if (verifyClicker(game.state.player1, room.creator, this.id)) {
         game.receiverClick(index, die)
         this.emit("click-update-state", game.state)
@@ -586,7 +589,7 @@ function handleReceiverClick(index, die) {
         this.to(`room-${room.id}`).emit("update-state", state)
 
         if (game.state.toggleFinalTable) {
-            io.to(`room-${room.id}`).emit("render-end-menu", game.state.player1)
+            io.to(`room-${room.id}`).emit("render-end-menu", game.state.winner)
         }
     }
 }
@@ -605,9 +608,15 @@ function verifyClicker(player, creator, socketID) {
     return ((player && (creator === socketID)) || (!player && (creator !== socketID)))
 }
 
-function findGameAndRoom(socketID) {
-    const room = currentSessions.find(room => room.players.includes(socketID));
-    const game = currentSessions.find(r => r.id === room.id).game
+function findGameAndRoom(socketID, isRandom) {
+    let room, game
+    if (isRandom === true) {
+        room = currentSessions.find(room => room.players.includes(socketID));
+        game = currentSessions.find(r => r.id === room.id).game
+    } else {
+        room = codedSessions.find(room => room.code === isRandom);
+        game = codedSessions.find(r => r.id === room.id).game
+    }
     return {game: game, room: room}
 }
 
@@ -632,13 +641,50 @@ function findGame() {
         console.log(`Player ${this.id} joined room ${room.id}`);
 
         io.to(`room-${room.id}`).emit("game-start")
-        gameStart(this.id)
+        gameStart(this.id, true)
     } else {
         // Create a new room and join it
         const newRoom = createRoom(this.id);
         newRoom.players.push(this.id);
         this.join(`room-${newRoom.id}`);
         console.log(`Player ${this.id} created and joined room ${newRoom.id}`);
+    }
+}
+
+function createGame() {
+    let code = Math.random().toString(36).substring(2, 8).toUpperCase()
+    while (codesUsed.includes(code)) {
+        code = Math.random().toString(36).substring(2, 8).toUpperCase()
+    }
+
+    const room = {
+        id: uuidv4(),
+        players: [],
+        game: new Game(this.id),
+        creator: this.id,
+        code: code
+      };
+    
+    codedSessions.push(room);
+    codesUsed.push(code);
+    room.players.push(this.id);
+    this.join(`room-${room.id}`);
+    console.log(`Player ${this.id} created and joined room ${room.id} with code ${room.code}`);
+    this.emit("created-room", room.code)
+}
+
+function joinGame(code) {
+    const room = codedSessions.find(room => room.players.length < 2 && room.code === code);
+
+    if (room) {
+        room.players.push(this.id)
+        this.join(`room-${room.id}`)
+        console.log(`Player ${this.id} joined room ${room.id}`);
+
+        io.to(`room-${room.id}`).emit("game-start")
+        gameStart(this.id, code)
+    } else {
+        this.emit("no-valid-room")
     }
 }
 

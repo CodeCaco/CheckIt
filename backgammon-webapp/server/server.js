@@ -10,15 +10,13 @@ const app = express()
 const server = http.createServer(app)
 const io = socketio(server)
 
-
 // run when client connects
 io.on('connection', client => {
 
     online.gameInit(io, client)
 
-    client.on('connection', name => {
-        client.name = name;
-        console.log(`Client connected with id ${client.id}`);
+    client.on('connection', () => {
+        // console.log(`Client connected with id ${client.id}`);
     });
 })
 
