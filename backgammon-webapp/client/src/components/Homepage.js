@@ -17,7 +17,7 @@ function Homepage() {
                 <div className="button-label">Play Locally</div>
               </button>
             </Link>
-            <Link to="/onlineMenu" className='noDecor'>
+            <Link to="/online" className='noDecor'>
               <button className="hero-button">                
                 <div className="button-image online-image"></div>
                 <div className="button-label">Play Online</div>

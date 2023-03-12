@@ -16,7 +16,7 @@ function App() {
       <Routes>
         <Route path='/' exact element={<Home />}/>
         <Route path='/localMenu' element={<LocalMenu />}/>
-        <Route path='/onlineMenu' element={<OnlineMenu />}/>
+        <Route path='/online' element={<OnlineMenu />}/>
         <Route path='/localPlay' element={<Play />}/>
       </Routes>
       <Footer />

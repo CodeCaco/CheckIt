@@ -8,6 +8,11 @@ function Navbar() {
   const [button, setButton] = useState(true);
 
   const handleClick = () => setClick(!click);
+  const handleLogoClick = () => {
+    setClick(false);
+    const socket = require('../connection').socket
+    socket.disconnect()
+  }
   const closeMobileMenu = () => setClick(false);
 
   const showButton = () => {
@@ -29,7 +34,7 @@ function Navbar() {
     <>
         <nav className='navbar'>
             <div className='navbar-container'>
-                <Link to="/" className="navbar-logo" onClick={closeMobileMenu}>
+                <Link to="/" className="navbar-logo" onClick={handleLogoClick}>
                     CheckIt &nbsp;<i className="fa-solid fa-circle-xmark"></i>
                 </Link>
                 <div className='menu-icon' onClick={handleClick}>

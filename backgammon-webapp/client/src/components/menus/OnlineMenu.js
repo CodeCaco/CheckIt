@@ -39,6 +39,10 @@ function OnlineMenu() {
     window.alert('Please enter a valid 6-character alphanumeric room code.');
   })
 
+  socket.on('player-disconnected', () => {
+    window.location.reload()
+  })
+
   function findGame() {
     socket.emit('find-game')
     setIsRandom(true)
@@ -61,7 +65,6 @@ function OnlineMenu() {
     if (code.length === 0 || code.length !== 6) {
       window.alert('Please enter a 6-character alphanumeric code.');
     } else {
-      console.log("papaya")
       socket.emit('join-game', code)
       setIsRandom(code)
       setSubmit(true)

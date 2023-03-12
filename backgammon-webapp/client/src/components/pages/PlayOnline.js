@@ -33,10 +33,12 @@ class PlayOnline extends Component {
 
   componentDidMount() {
     this.socket.on('update-state', state => {
+      state = JSON.parse(state)
       this.setState(state)
     })
 
     this.socket.on('calculate-roll', state => {
+      state = JSON.parse(state)
       state.pips.forEach((pip,i) => {
         if ("movable" in pip) {
           const [originIndex, pipPath, firstCheckerIndex] = pip.movable
@@ -44,9 +46,11 @@ class PlayOnline extends Component {
         }
       })
       this.setState(state)
+
     })
 
     this.socket.on('click-update-state', state => {
+      state = JSON.parse(state)
       state.pips.forEach((pip,i) => {
         if ("movable" in pip) {
           const [originIndex, pipPath, firstCheckerIndex] = pip.movable
@@ -68,30 +72,41 @@ class PlayOnline extends Component {
 
     this.socket.on("render-no-moves", this.renderNoMoves)
     this.socket.on("render-end-menu", winner => {
+      winner = JSON.parse(winner)
       this.renderEndMenu(winner)
     })
 
+    this.socket.on('player-disconnect', () => {
+      if (this.state.finalTable === null) {
+        window.alert("Opponent player has disconnected")
+        this.socket.emit("player-disconnected")
+      }
+    })
+  
+
+    this.handleDiceButtonClick = () => {
+      this.socket.emit("dice-click", this.isRandom)
+    };
+  
     const rollDie = document.getElementById("rollDie")
     if (rollDie !== null) {
-      rollDie.addEventListener('click', () => {
-        this.socket.emit("dice-click", this.isRandom)
-      })
+      rollDie.addEventListener('click', this.handleDiceButtonClick)
+    }
+
+    window.onpopstate = () => {
+      this.socket.disconnect()
     }
   }
   
   componentDidUpdate() {
     const rollDieRemove = document.getElementById("rollDie")
     if (rollDieRemove !== null) {
-      rollDieRemove.removeEventListener('click', () => {
-        this.socket.emit("dice-click", this.isRandom)
-      })
+      rollDieRemove.removeEventListener('click', this.handleDiceButtonClick)
     }
-  
+
     const rollDieAdd = document.getElementById("rollDie")
     if (rollDieAdd !== null) {
-      rollDieAdd.addEventListener('click', () => {
-        this.socket.emit("dice-click", this.isRandom)
-      })
+      rollDieAdd.addEventListener('click', this.handleDiceButtonClick)
     }
   }
 
@@ -122,7 +137,7 @@ class PlayOnline extends Component {
     const winnerString = winner ? "Player 1" : "Player 2"
     const height = document.getElementsByClassName("progress")[0].clientHeight + document.getElementsByClassName("playground")[0].clientHeight
     const width = window.innerWidth
-    const table = (<EndMenu height={height} winnerString={winnerString} width={width} data={this.state.redWPHistory}/>)
+    const table = (<EndMenu height={height} winnerString={winnerString} width={width} data={this.state.redWPHistory} onClick={true}/>)
 
     this.setState({
       finalTable: table

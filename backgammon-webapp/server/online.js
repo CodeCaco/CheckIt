@@ -29,19 +29,19 @@ class Game {
     newGameSetup = () => {
         const pips = Array(24).fill({player: null, checkers: 0})
 
-        pips[12] = {player: 1, checkers: 1}
-        pips[11] = {player: 2, checkers: 1}
+        pips[12] = {player: 1, checkers: 15}
+        pips[11] = {player: 2, checkers: 15}
 
         const boxes = Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15}))
 
-        boxes[0].checkers = 14
-        boxes[1].checkers = 14 
+        boxes[0].checkers = 0
+        boxes[1].checkers = 0 
 
         this.state = {
             dice: [],
             player1: true,
-            p1FirstChecker: false,
-            p2FirstChecker: false,
+            p1FirstChecker: 12,
+            p2FirstChecker: 11,
             moving: false,
             pips: pips,
             p1Path: [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
@@ -527,15 +527,15 @@ const gameInit = (sio, ssocket) => {
 
     gameSocket.on('join-game', joinGame)
 
-    gameSocket.on('disconnect', () => {
-        // console.log("This socket ", gameSocket.id, " has disconnected")
-    }) 
+    gameSocket.on('disconnect', handleDisconnect) 
 
     gameSocket.on("dice-click", diceClick)
 
     gameSocket.on("checker-click", handleCheckerClick)
     
     gameSocket.on("receiver-click", handleReceiverClick)
+
+    gameSocket.on("player-disconnected", handlePlayerDisconnect)
 }
 
 /* --------------------------------- */
@@ -547,14 +547,14 @@ function gameStart(socketID, isRandom) {
     const roomName = "room-" + room.id
 
     game.newGameSetup()
-    io.to(roomName).emit("update-state", game.state)
+    io.to(roomName).emit("update-state", JSON.stringify(game.state))
 }
 
 function diceClick(isRandom) {
     const {game, room} = findGameAndRoom(this.id, isRandom)
     if (verifyClicker(game.state.player1, room.creator, this.id)) {
         game.calculateRoll()
-        this.emit("calculate-roll", game.state)
+        this.emit("calculate-roll", JSON.stringify(game.state))
 
         if (game.state.toggleNoMoves) {
             this.emit("render-no-moves")
@@ -562,7 +562,7 @@ function diceClick(isRandom) {
         }
 
         const state = cleanState(game)
-        this.to(`room-${room.id}`).emit("update-state", state)
+        this.to(`room-${room.id}`).emit("update-state", JSON.stringify(state))
     }
 }
 
@@ -570,7 +570,7 @@ function handleCheckerClick(originIndex, pipPath, firstCheckerIndex, isRandom) {
     const {game, room} = findGameAndRoom(this.id, isRandom)
     if (verifyClicker(game.state.player1, room.creator, this.id)) {
         game.checkerClick(originIndex, pipPath, firstCheckerIndex)
-        this.emit("click-update-state", game.state)
+        this.emit("click-update-state", JSON.stringify(game.state))
     }
 }
 
@@ -578,7 +578,7 @@ function handleReceiverClick(index, die, isRandom) {
     const {game, room} = findGameAndRoom(this.id, isRandom)
     if (verifyClicker(game.state.player1, room.creator, this.id)) {
         game.receiverClick(index, die)
-        this.emit("click-update-state", game.state)
+        this.emit("click-update-state", JSON.stringify(game.state))
 
         if (game.state.toggleNoMoves) {
             this.emit("render-no-moves")
@@ -586,16 +586,42 @@ function handleReceiverClick(index, die, isRandom) {
         }
 
         const state = cleanState(game)
-        this.to(`room-${room.id}`).emit("update-state", state)
+        this.to(`room-${room.id}`).emit("update-state", JSON.stringify(state))
 
         if (game.state.toggleFinalTable) {
-            io.to(`room-${room.id}`).emit("render-end-menu", game.state.winner)
+            io.to(`room-${room.id}`).emit("render-end-menu", JSON.stringify(game.state.winner))
         }
     }
 }
 /* --------------------------------- */
 /*         Utility Functions         */
 /* --------------------------------- */
+
+function handlePlayerDisconnect() {
+    this.emit("player-disconnected")
+}
+
+function handleDisconnect() {
+    const current = currentSessions.find(room => room.players.includes(this.id));
+    const coded  = codedSessions.find(room => room.players.includes(this.id));
+
+    if (current) {
+        // remove current room from codedSessions
+        const index = currentSessions.indexOf(current);
+        if (index !== -1) {
+            currentSessions.splice(index, 1);
+        }
+        this.to(`room-${current.id}`).emit("player-disconnect")
+    } else if (coded) {
+        // remove coded room from codedSessions
+        const index = codedSessions.indexOf(coded);
+        if (index !== -1) {
+            codedSessions.splice(index, 1);
+        }
+        this.to(`room-${coded.id}`).emit("player-disconnect")
+    }
+    this.leaveAll()
+}
 
 function cleanState(game) {
     const state = game.state

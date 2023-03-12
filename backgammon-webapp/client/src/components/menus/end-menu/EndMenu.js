@@ -4,6 +4,14 @@ import { Graph } from './Graph'
 import {Link} from 'react-router-dom';
 
 export const EndMenu = (props) => {
+
+  function handleOnlineConnection() {
+    if (props.onClick) {
+      const socket = require('../../../connection').socket
+      socket.disconnect()
+    }
+  }
+  
   return (
     <>
        <div className='menu-shadow' style={{"--height": props.height, "--width": props.width}}>
@@ -17,7 +25,7 @@ export const EndMenu = (props) => {
         <div className="menu-graph">
             <Graph data={props.data}></Graph>
         </div>
-        <Link to="/" className="menu-button">
+        <Link to="/" className="menu-button" onClick={handleOnlineConnection}>
             <button className="btn-main-menu">Main Menu</button>
         </Link>
       </div>
