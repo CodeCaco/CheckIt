@@ -1,7 +1,6 @@
 const express = require('express')
 const http = require('http')
 const socketio = require('socket.io')
-const cookie = require('cookie')
 const online = require('./online')
 
 const app = express()

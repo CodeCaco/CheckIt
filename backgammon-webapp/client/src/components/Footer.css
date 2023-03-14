@@ -1,12 +1,12 @@
 .footer {
     /* position: absolute; */
     /* width: 100%; */
-    height: 3vw;
+    height: 50px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1%;
+    padding: 17.5px;
     background: linear-gradient(90deg, var(--outsideColour) 0%, black 300%);
     color: white;
-    font-size: 1vw;
+    font-size: 15px;
 }

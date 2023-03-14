@@ -1,0 +1,65 @@
+.waited-background {
+    position: relative;
+    background-color: var(--mainColour);
+    width: 100%;
+    height: calc(100vh - 80px - 50px);
+    display: grid; 
+    grid-auto-columns: 1fr; 
+    grid-template-columns: 0.4fr 2.3fr 0.4fr; 
+    grid-template-rows: 1fr 1fr;
+    gap: 0px 0px; 
+    justify-content: center;
+    grid-template-areas: 
+        ". waiting ."
+        ". leave-button ."
+}
+
+.waited-header {
+    position: relative;
+    align-self: center;
+    background-color: var(--mainColour);
+    width: 100%;
+    aspect-ratio: 32 / 2;
+    padding-top: 2vw;
+    padding-left: 20%;
+    padding-right: 20%;
+    text-align: center;
+    font-family: var(--mainFont);
+    font-weight: 800;
+    color: var(--textColour);
+    text-shadow: var(--textShadow);
+    font-size: 4vw;
+    line-height: 1;
+    grid-area: waiting;
+}
+
+.leave-button {
+    justify-self: center;
+    width: 25vw;
+    aspect-ratio: 3;
+    background-color: var(--attentionColour);
+    border-radius: 10px;
+    border-style: none;
+    box-shadow: 0 0.5vw 0 0 var(--attentionColourLower) ,0 0.7vw .95vw .05vw var(--hoverColour);
+    --hoverColour: rgba(0,0,0,.2);
+    color: var(--textColour);
+    text-shadow: var(--textShadow);
+    cursor: pointer;
+    text-align: center;
+    font-family: "Montserrat",sans-serif;
+    font-size: 2.7vw;
+    font-weight: 700;
+    line-height: 2;
+    padding: 3% 5%;
+    line-height: 1.6;
+    grid-area: leave-button;
+  }
+  
+  .leave-button:hover {
+    background-color: var(--attentionColourHigher);
+    opacity: 1;
+  }
+  
+  .leave-button:not([disabled]):hover {
+    --hoverColour: var(--attentionAccentColour);
+  }

@@ -2,12 +2,12 @@ import React from 'react'
 import './EndMenu.css'
 import { Graph } from './Graph'
 import {Link} from 'react-router-dom';
+const socket = require('../../../connection').socket
 
 export const EndMenu = (props) => {
 
   function handleOnlineConnection() {
     if (props.onClick) {
-      const socket = require('../../../connection').socket
       socket.disconnect()
     }
   }

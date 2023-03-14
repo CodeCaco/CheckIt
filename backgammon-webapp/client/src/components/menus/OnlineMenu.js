@@ -1,30 +1,29 @@
 import React from 'react'
 import './OnlineMenu.css'
 import '../../App.css';
-import cookie from 'cookie';
 import { useState } from 'react';
 import PlayOnline from '../pages/PlayOnline';
+import  WaitingLobby from '../menus/online-menu/WaitingLobby'
+import  CodedLobby  from '../menus/online-menu/CodedLobby'
 
 const socket = require('../../connection').socket
+
+function generateRandomGreekName() {
+  const greekAlphabet = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta', 'Iota', 'Kappa', 'Lambda', 'Mu', 'Nu', 'Xi', 'Omicron', 'Pi', 'Rho', 'Sigma', 'Tau', 'Upsilon', 'Phi', 'Chi', 'Psi', 'Omega']
+
+  return greekAlphabet[Math.floor(Math.random() * greekAlphabet.length)]
+}
 
 function OnlineMenu() {
   const [waitingPlayer, setWaitingPlayer] = useState(true)
   const [submit, setSubmit] = useState(false)
   const [create, setCreate] = useState(false)
-  const [code, setCode] = useState("000000")
+  const [code, setCode] = useState("")
   const [isRandom, setIsRandom] = useState(true) 
+  const [isCreator, setIsCreator] = useState(false)
+  const [opponentJoin, setOpponentJoin] = useState(false)
+  const opponent = generateRandomGreekName()
   
-
-  document.cookie = cookie.serialize('io', 'example', {
-  path: '/',
-  sameSite: 'Strict',
-  secure: true,
-  });
-  
-  socket.on("connect", () => {
-    socket.emit("connection")
-  });
-
   socket.on('game-start', () => {
     setWaitingPlayer(false)
   })
@@ -39,8 +38,16 @@ function OnlineMenu() {
     window.alert('Please enter a valid 6-character alphanumeric room code.');
   })
 
+  socket.on('player-joined', () => {
+    setOpponentJoin(true)
+  })
+
   socket.on('player-disconnected', () => {
     window.location.reload()
+  })
+
+  socket.off('opponent-left').on('opponent-left', () => {
+    window.alert("Opponent player has disconnected")
   })
 
   function findGame() {
@@ -51,6 +58,7 @@ function OnlineMenu() {
 
   function createGame() {
     socket.emit('create-game')
+    setIsCreator(true)
     setCreate(true)
     setIsRandom(false)
     setSubmit(true)
@@ -66,24 +74,47 @@ function OnlineMenu() {
       window.alert('Please enter a 6-character alphanumeric code.');
     } else {
       socket.emit('join-game', code)
+      setOpponentJoin(true)
       setIsRandom(code)
       setSubmit(true)
+      setCreate(true)
     }
   };
 
   return (
     <>
-      {waitingPlayer ? submit ? create ? <p>Code: {code}</p> 
+      {waitingPlayer ? submit ? create ? 
+      <CodedLobby isCreator={isCreator} opponentJoin={opponentJoin} opponent={opponent} code={code}/>
       :
-      <p>Waiting for Player....</p>
+      <WaitingLobby />
       :
-      <div>
-        <div>OnlineMenu</div>
-        <button onClick={() => {findGame()}}>Play Random</button>
-        <button onClick={() => {createGame()}}>Create Game</button>
-        <button onClick={() => {joinGame()}}>Join Game</button>
-        <input type="text" value={code} onChange={handleInputChange} />
-        {/* Gotta add text input to be the thingy */}
+      <div className="online-menu-background">
+        <div className="online-header">OnlineMenu</div>
+        <div className="online-content-wrapper">
+          <div className="online-content random-online">
+            <div className="content-headpiece">Play Stranger</div>
+            <div className="content-content">
+              <p className="content-text">You will be randomly paired with another player to start the game. <br />Get ready to show off your skills and see how well you fare against your new opponent!</p>
+              <button className="content-button" onClick={() => {findGame()}}>Find</button>
+            </div>
+          </div>
+          <div className="content-border"></div>
+          <div className="online-content create-online">
+            <div className="content-headpiece">Create Party</div>
+            <div className="content-content">
+              <p className="content-text">You will receive a room code. <br /> Share room code with your friends and they can join the same game.</p>
+              <button className="content-button" onClick={() => {createGame()}}>Create</button>
+            </div>
+          </div>
+          <div className="online-content join-online">
+            <div className="content-headpiece">Join Party</div>
+            <div className="content-content join-room">
+              <p className="enter-code">Enter Room Code:</p>
+              <input className="code-input" type="text" value={code} onChange={handleInputChange} placeholder="Room Code:"/>
+              <button className="content-button" onClick={() => {joinGame()}}>Join</button>
+            </div>
+          </div>
+        </div>
       </div>
       : <PlayOnline isRandom={isRandom}/>
       }

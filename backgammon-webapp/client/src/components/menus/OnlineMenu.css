@@ -1,0 +1,189 @@
+.online-menu-background {
+    position: relative;
+    background-color: var(--mainColour);
+    width: 100%;
+    min-height: calc(100vh - 80px - 50px);
+    overflow: auto;
+    display: grid; 
+    grid-auto-columns: 1fr; 
+    grid-template-rows: 0.2fr 1fr 0.01fr;
+    gap: 0px 0px; 
+    justify-content: center;
+    grid-template-areas: 
+        "online-header"
+        "online-content"
+        "."
+}
+
+.online-header {
+    grid-area: online-header;
+    align-self: center;
+    background-color: var(--mainColour);
+    width: 100%;
+    aspect-ratio: 32 / 2;
+    padding-top: 2vw;
+    padding-left: 20%;
+    padding-right: 20%;
+    text-align: center;
+    font-family: var(--mainFont);
+    font-weight: 800;
+    color: var(--textColour);
+    text-shadow: var(--textShadow);
+    font-size: 4vw;
+    line-height: 1;
+}
+
+.online-content-wrapper {
+    grid-area: online-content;
+    width: 100%;
+    height: 100%;
+    display: grid; 
+    grid-auto-columns: 1fr; 
+    grid-template-columns: 1fr 0.1fr 1fr 1fr;
+    gap: 0px 0px; 
+    justify-content: center;
+    grid-template-areas: 
+        "random border create join"
+}
+
+.content-headpiece {
+    width: 80%;
+    height: 10%;
+    border-radius: 10px;
+    border-bottom-left-radius: 0%;
+    border-bottom-right-radius: 0%;
+    margin: auto;
+    margin-top: 2vw;
+    background-color: var(--outsideColour); 
+    text-align: center;
+    font-family: var(--mainFont);
+    font-weight: 800;
+    color: var(--textColour);
+    text-shadow: var(--textShadow);
+    font-size: 2vw;
+    line-height: 1.6;
+}
+
+.content-content {
+    width: 80%;
+    height: 70%;
+    border-radius: 10px;
+    border-top-left-radius: 0%;
+    border-top-right-radius: 0%;
+    margin: auto;
+    background-color: rgba(192, 214, 223, 0.3);
+    display: grid; 
+    grid-auto-columns: 1fr; 
+    grid-template-rows: 1fr 0.4fr;
+    gap: 0px 0px; 
+    justify-content: center;
+    grid-template-areas: 
+        "content-text"
+        "content-button"
+}
+
+.join-room {
+    display: grid; 
+    grid-auto-columns: 1fr; 
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 0px 0px; 
+    justify-content: center;
+    grid-template-areas: 
+        "input-header"
+        "content-input"
+        "content-button"
+}
+
+.content-text {
+    grid-area: content-text;
+    font-size: 1.7vw;
+    text-align: start;
+    margin: 1.5vw;
+    color: var(--textColour);
+    font-family: "Montserrat",sans-serif;
+    font-weight: 700;
+    line-height: 1;
+    overflow: auto;
+}
+
+.enter-code {
+    grid-area: input-header;
+    font-size: 2vw;
+    text-align: start;
+    justify-self: center;
+    align-self: end;
+    margin: 10px;
+    color: var(--mainAccentColour);
+    text-shadow: var(--textShadow);
+    font-family: "Montserrat",sans-serif;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.code-input {
+    grid-area: content-input;
+    justify-self: center;
+    border-radius: 10px;
+    width: 80%;
+    aspect-ratio: 5;
+    border: 0.2vw solid var(--outsideColour);
+    padding: 12px 20px;
+    color: var(--mainColour);
+    font-size: 1.7vw;
+    font-family: "Montserrat",sans-serif;
+    font-weight: 700;
+    line-height: 1;
+
+}
+
+.content-button {
+    grid-area: content-button;
+    width: 80%;
+    height: 60%;
+    justify-self: center;
+    align-self: center;
+    background-color: var(--attentionColour);
+    border-radius: 10px;
+    border-style: none;
+    box-shadow: 0 0.5vw 0 0 var(--attentionColourLower) ,0 0.7vw .95vw .05vw var(--hoverColour);
+    --hoverColour: rgba(0,0,0,.2);
+    color: var(--textColour);
+    text-shadow: var(--textShadow);
+    cursor: pointer;
+    text-align: center;
+    font-family: "Montserrat",sans-serif;
+    font-size: 3vw;
+    font-weight: 700;
+    padding: 1vw 1vw;
+    line-height: 0.8;
+}
+
+.content-button:hover {
+    background-color: var(--attentionColourHigher);
+    opacity: 1;
+}
+
+.content-button:not([disabled]):hover {
+    --hoverColour: var(--attentionAccentColour);
+}
+
+.random-online {
+    grid-area: random;
+}
+
+.create-online {
+    grid-area: create;
+}
+
+.join-online {
+    grid-area: join;
+}
+
+.content-border {
+    border-radius: 99px;
+    width: 30%;
+    height: 80%;
+    margin: auto;
+    margin-top: 2vw;
+    background-color: var(--outsideColour);
+}

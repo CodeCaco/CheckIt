@@ -35,7 +35,7 @@ class Game {
         const boxes = Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15}))
 
         boxes[0].checkers = 0
-        boxes[1].checkers = 0 
+        boxes[1].checkers = 0
 
         this.state = {
             dice: [],
@@ -527,6 +527,10 @@ const gameInit = (sio, ssocket) => {
 
     gameSocket.on('join-game', joinGame)
 
+    gameSocket.on('start-game', startGame)
+
+    gameSocket.on("player-left-lobby", playerLeftLobby)
+
     gameSocket.on('disconnect', handleDisconnect) 
 
     gameSocket.on("dice-click", diceClick)
@@ -596,6 +600,14 @@ function handleReceiverClick(index, die, isRandom) {
 /* --------------------------------- */
 /*         Utility Functions         */
 /* --------------------------------- */
+
+function playerLeftLobby() {
+    const coded  = codedSessions.find(room => room.players.includes(this.id));
+    if (coded) {
+        this.to(`room-${coded.id}`).emit("opponent-left")
+        io.to(`room-${coded.id}`).emit("player-disconnected")
+    }
+}
 
 function handlePlayerDisconnect() {
     this.emit("player-disconnected")
@@ -707,11 +719,16 @@ function joinGame(code) {
         this.join(`room-${room.id}`)
         console.log(`Player ${this.id} joined room ${room.id}`);
 
-        io.to(`room-${room.id}`).emit("game-start")
-        gameStart(this.id, code)
+        this.to(`room-${room.id}`).emit("player-joined")
     } else {
         this.emit("no-valid-room")
     }
+}
+
+function startGame() {
+    const room  = codedSessions.find(room => room.players.includes(this.id));
+    io.to(`room-${room.id}`).emit("game-start")
+    gameStart(this.id, room.code)
 }
 
 

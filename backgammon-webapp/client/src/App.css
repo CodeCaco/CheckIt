@@ -9,9 +9,9 @@
   --textColour: #EAEAEA;
   --textSecondaryColour: hsl(0, 0%, 80%);
   --textShadow: 0 .1rem 0 rgba(0,0,0,.4);
-  --attentionColour: hsl(34, 100%, 47%);
-  --attentionColourLower: hsl(34, 100%, 38%);
-  --attentionColourHigher: hsl(34, 100%, 56%);
+  --attentionColour: #f08800;
+  --attentionColourLower: #c26e00;
+  --attentionColourHigher: #ff9e1f;
   --attentionAccentColour: #FFF585;
   --mainFont: "Montserrat",sans-serif;
 }

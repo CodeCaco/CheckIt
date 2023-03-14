@@ -1,6 +1,6 @@
 .local-wrapper {
     width: 100%;
-    height: calc(100vh - 9vw);
+    height: calc(100vh - 80px - 50px);
     background-color: var(--mainColour);
 }
 
@@ -42,7 +42,7 @@
     height: 100%;
     aspect-ratio: 1;
     border: solid 1vw black;
-    border-radius: 4%;
+    border-radius: 10px;
     background-color: white;
     display: grid;
     grid-template-areas:
@@ -93,7 +93,7 @@
     height: 100%;
     aspect-ratio: 1;
     border: solid 1vw black;
-    border-radius: 4%;
+    border-radius: 10px;
     background-color: white;
     display: grid;
     grid-template-areas:
@@ -138,7 +138,7 @@
     aspect-ratio: 1;
     border: 0.5vw solid black;
     background-color: grey;
-    border-radius: 4%;
+    border-radius: 10px;
     justify-content: center;
     text-align: center;
     vertical-align: middle;
@@ -184,7 +184,7 @@
     appearance: none;
     backface-visibility: hidden;
     background-color: var(--attentionColour);
-    border-radius: 4%;
+    border-radius: 10px;
     border-style: none;
     box-shadow: 0 0.5vw 0 0 var(--attentionColourLower) ,0 0.7vw .95vw .05vw var(--hoverColour);
     --hoverColour: rgba(0,0,0,.2);

@@ -7,12 +7,14 @@ import { ProgressBar } from '../board/ProgressBar';
 import { EndMenu } from '../menus/end-menu/EndMenu';
 import { NoMoves } from '../board/outside/dice/NoMoves';
 
+const socket = require('../../connection').socket
+
 class PlayOnline extends Component {
 
   constructor(props) {
     super(props)
     this.isRandom = props.isRandom
-    this.socket = require('../../connection').socket
+    this.socket = socket
 
     this.state = {
       dice: [],
@@ -155,9 +157,6 @@ class PlayOnline extends Component {
           {this.state.noMoves}
           <Board state={this.state} player1={this.state.player1} rollDice={this.calculateRoll} dice={this.state.dice}/>
         </div>
-        {/* <button onClick={this.test}>clear</button> */}
-        {/* <button onClick={this.newGameSetup}>start</button>
-        <button onClick={() => this.renderEndMenu(this.state.player1)}>test</button> */}
       </>
     );
 }

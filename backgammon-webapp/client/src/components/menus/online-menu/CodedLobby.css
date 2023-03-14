@@ -1,0 +1,177 @@
+.coded-background {
+    position: relative;
+    background-color: var(--mainColour);
+    width: 100%;
+    height: calc(100vh - 80px - 50px);
+    display: grid; 
+    grid-auto-columns: 1fr; 
+    grid-template-columns: 1fr 3fr 1fr; 
+    gap: 0px 0px; 
+    justify-content: center;
+    grid-template-areas: 
+        "leave-button center-content . ";
+    overflow: auto;
+}
+
+.coded-leave-lobby {
+    grid-area: leave-button;
+    background-color: var(--attentionColour);
+    margin: 1vw;
+    width: 25%;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    border-style: none;
+    box-shadow: 0 0.5vw 0 0 var(--attentionColourLower) ,0 0.7vw .95vw .05vw var(--hoverColour);
+    --hoverColour: rgba(0,0,0,.2);
+    background-image: url("../../../assets/exit.svg");
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-position: center;
+    transform: scaleX(-1);
+}
+
+.coded-leave-lobby:hover {
+    background-image: url("../../../assets/exit_hover.svg");
+    background-color: var(--attentionColourHigher);
+    opacity: 1;
+  }
+  
+  .coded-leave-lobby:not([disabled]):hover {
+    --hoverColour: var(--attentionAccentColour);
+  }
+
+.coded-central {
+    grid-area: center-content;
+    width: 100%;
+    height: 100%;
+    display: grid; 
+    grid-auto-columns: 1fr; 
+    grid-template-rows: 1fr 0.5fr 1fr 0.1fr 1fr 1fr; 
+    gap: 0px 0px; 
+    align-items: center;
+    justify-items: center;
+    grid-template-areas: 
+        "header"
+        "code"
+        "player1"
+        "."
+        "player2"
+        "start"
+}
+
+.coded-header {
+    grid-area: header;
+    vertical-align: middle;
+    font-size: 6vw;
+    color: var(--textColour);
+    text-shadow: 0 .1rem 0 rgba(0,0,0,.4);
+    font-family: "Montserrat",sans-serif;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.coded-code {
+    grid-area: code;
+    align-self: start;
+    font-size: 2vw;
+    color: var(--mainAccentColour);
+    text-shadow: 0 .1rem 0 rgba(0,0,0,.4);
+    font-family: "Montserrat",sans-serif;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.coded-player {
+    width: 80%;
+    aspect-ratio: 7;
+    border: solid 0.45vw #313a3b;
+    position: relative;
+    border-radius: 10px;
+    background-color: var(--textColour);
+    box-shadow: 9px 9px 20px 0px #C0D6DF;
+    display: grid; 
+    grid-auto-columns: 1fr; 
+    grid-template-columns: 1fr 3fr; 
+    gap: 0px 2.5vw; 
+    justify-content: center;
+    grid-template-areas: 
+        "image label";
+}
+
+.coded-player.p1 {
+    grid-area: player1;
+}
+
+.current-player {
+    box-shadow: 9px 9px 20px 0px #FFF585;
+}
+
+.coded-player.p2 {
+    grid-area: player2;
+}
+
+.coded-image {
+    grid-area: image;
+    width: 100%;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    background-color: var(--mainAccentColour);
+    background-repeat: no-repeat;
+    background-size: 50%;
+    background-position: center;
+    background-image: url("../../../assets/profile.svg");
+    border-right: #313a3b solid ;
+}
+
+.coded-label {
+    grid-area: label;
+    width: 100%;
+    height: 100%;
+    font-size: 3vw;
+    text-align: start;
+    color: var(--mainColour);
+    font-family: "Montserrat",sans-serif;
+    font-weight: 700;
+    line-height: 2;
+}
+
+.coded-image.creator {
+    background-image: url("../../../assets/crown.svg");
+    background-size: 60%;
+    background-color: var(--attentionColour);
+}
+
+.coded-label.creator {
+    color: var(--attentionColour);
+}
+
+.coded-start {
+    justify-self: center;
+    width: 50%;
+    height: 65%;
+    background-color: var(--attentionColour);
+    border-radius: 10px;
+    border-style: none;
+    box-shadow: 0 0.5vw 0 0 var(--attentionColourLower) ,0 0.7vw .95vw .05vw var(--hoverColour);
+    --hoverColour: rgba(0,0,0,.2);
+    color: var(--textColour);
+    text-shadow: var(--textShadow);
+    cursor: pointer;
+    text-align: center;
+    font-family: "Montserrat",sans-serif;
+    font-size: 2.7vw;
+    font-weight: 700;
+    line-height: 2;
+    padding: 1vw 1vw;
+    line-height: 1.6;
+    grid-area: start;
+  }
+  
+  .coded-start:hover {
+    background-color: var(--attentionColourHigher);
+    opacity: 1;
+  }
+  
+  .coded-start:not([disabled]):hover {
+    --hoverColour: var(--attentionAccentColour);
+  }

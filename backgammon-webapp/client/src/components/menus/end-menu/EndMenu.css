@@ -18,7 +18,7 @@
     margin: 0 auto;
     background-color: var(--mainColour);
     box-shadow: 15px 15px 15px 15px rgba(0, 0, 0, 0.644);
-    border-radius: 4%;
+    border-radius: 10px;
     width: 65%;
     aspect-ratio: 1.6;
     padding: 1vw;
@@ -50,7 +50,7 @@
     height: 100%;
     width: 35%;
     border: 0.75vw solid var(--mainAccentColour);
-    border-radius: 4%;
+    border-radius: 10px;
     background-color: #e80000;
     box-shadow: 0 .3rem .4rem .1rem rgba(0,0,0,.4);
     background-image: url("../../../assets/profile.svg");
@@ -72,7 +72,7 @@
     height: 100%;
     width: 35%;
     border: 0.75vw solid var(--mainAccentColour);
-    border-radius: 4%;
+    border-radius: 10px;
     background-color: white;
     box-shadow: 0 .3rem .4rem .1rem rgba(0,0,0,.4);
     background-image: url("../../../assets/profile.svg");
@@ -103,7 +103,7 @@
 .btn-main-menu {
     width: 50%;
     background-color: var(--attentionColour);
-    border-radius: 4%;
+    border-radius: 10px;
     border-style: none;
     box-shadow: 0 0.5vw 0 0 var(--attentionColourLower) ,0 0.7vw .95vw .05vw var(--hoverColour);
     --hoverColour: rgba(0,0,0,.2);
