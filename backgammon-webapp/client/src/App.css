@@ -1,0 +1,17 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'PT Sans', sans-serif;
+  --outsideColour: #313a3b;
+  --mainColour: #4C5B5C;
+  --mainAccentColour: #C0D6DF;
+  --textColour: #EAEAEA;
+  --textSecondaryColour: hsl(0, 0%, 80%);
+  --textShadow: 0 .1rem 0 rgba(0,0,0,.4);
+  --attentionColour: #f08800;
+  --attentionColourLower: #c26e00;
+  --attentionColourHigher: #ff9e1f;
+  --attentionAccentColour: #FFF585;
+  --mainFont: "Montserrat",sans-serif;
+}
