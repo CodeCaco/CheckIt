@@ -2,209 +2,240 @@
     width: 100%;
     height: calc(100vh - 80px - 50px);
     background-color: var(--mainColour);
+    overflow: auto;
+    display: grid; 
+    grid-auto-columns: 1fr; 
+    grid-template-columns: 0.1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 0px 0px; 
+    justify-content: center;
+    grid-template-areas: 
+        "leave-button local-top"
+        ". local-middle"
+        ". local-bottom"
+        ". ."
 }
 
-.local-header {
-    width: 100%;
-    aspect-ratio: 32/1;
-    font-size: 4vw;
-    text-align: center;
-    color: var(--textColour);
-    text-shadow: 0 .1rem 0 rgba(0,0,0,.4);
-    font-family: "Montserrat",sans-serif;
-    font-weight: 700;
-    line-height: 1;
-    background-color: var(--mainColour);
-    padding: 2vw;
-}
-
-.local-type {
-    width: 100%;
-    aspect-ratio: 32/5;
-    background-color: var(--mainColour);
-    display: flex;
-    justify-content: space-between;
-    padding-left: 20%;
-    padding-right: 20%;
-}
-
-.type-labels {
-    width: 100%;
-    aspect-ratio: 32/1;
-    background-color: var(--mainColour);
-    display: flex;
-    justify-content: space-between;
-    padding-left: 20%;
-    padding-right: 20%;
-}
-
-.type-cpu {
-    height: 100%;
+.local-leave-button {
+    grid-area: leave-button;
+    background-color: var(--attentionColour);
+    margin: 1vw;
+    width: 55%;
     aspect-ratio: 1;
-    border: solid 1vw black;
     border-radius: 10px;
-    background-color: white;
-    display: grid;
-    grid-template-areas:
-		"a b"
-        "c d";
-}
-
-.type-cpu:hover {
-    cursor: pointer;
-    background-color: lightgrey;
-}
-
-.cpu-label {
-    width: 25%;
-    vertical-align: middle;
-    text-align: center;
-    color: white;
-    text-shadow: 0 .1rem 0 rgba(0,0,0,.4);
-    font-family: "Montserrat",sans-serif;
-    font-weight: 700;
-    line-height: 1.6;
-    font-size: 2vw;
-}
-
-.cpu-image {
-    background-image: url("../../assets/cpu.svg");
+    border-style: none;
+    box-shadow: 0 0.5vw 0 0 var(--attentionColourLower) ,0 0.7vw .95vw .05vw var(--hoverColour);
+    --hoverColour: rgba(0,0,0,.2);
+    background-image: url("../../assets/exit.svg");
     background-repeat: no-repeat;
     background-size: 100%;
-    background-position: 0px 1vw;
+    background-position: center;
+    transform: scaleX(-1);
+}
+
+.local-leave-button:hover {
+    background-image: url("../../assets/exit_hover.svg");
+    background-color: var(--attentionColourHigher);
+    opacity: 1;
+  }
+  
+.local-leave-button:not([disabled]):hover {
+    --hoverColour: var(--attentionAccentColour);
+}
+
+.local-leave-button:active {
+    box-shadow: 0 0.3vw 0 0 var(--attentionColourLower) ,0 0.5vw .75vw .03vw var(--hoverColour);
+    transform: scaleX(-1) translateY(4px);
+}
+
+.local-template {
+    display: grid; 
+    grid-auto-columns: 1fr; 
+    grid-template-rows: 0.2fr 1fr;
+    gap: 0px 0px; 
+    justify-content: center;
+    grid-template-areas: 
+        "label"
+        "buttons"
+}
+
+.local-template.game-types{
+    grid-area: local-top;
+}
+
+.local-template.game-rounds{
+    grid-area: local-middle;
+}
+
+.local-template.game-turns{
+    grid-area: local-bottom;
+}
+
+.type-header {
+    grid-area: label;
+    margin-top: 1vw;
+    background-color: var(--mainColour);
     width: 100%;
-    aspect-ratio: 1;
+    font-family: var(--mainFont);
+    font-weight: 700;
+    color: var(--textColour);
+    text-shadow: var(--textShadow);
+    font-size: 2.5vw;
+    line-height: 1;
+    align-self: end;
 }
 
-.player-image {
-    background-image: url("../../assets/player.svg");
-    background-repeat: no-repeat;
-    background-size: 80%;
-    background-position: bottom;
+.types {
+    grid-area: buttons;
+    display: grid; 
+    grid-auto-columns: 1fr; 
+    grid-template-columns: 1fr 1fr;
+    gap: 0px 0px; 
+    justify-content: center;
+    grid-template-areas: 
+        "cpu versus"
+}
+
+.type-template {
+    background-color: var(--mainAccentColour);
+    margin: 1vw;
+    width: 55%;
+    aspect-ratio: 3.5;
+    border-radius: 10px;
+    border-style: none;
+    box-shadow: 0 0.5vw 0 0 #7baabc;
+    --hoverColour: rgba(0,0,0,.2);
+    opacity: 0.5;
+    display: grid; 
+    grid-auto-columns: 1fr; 
+    grid-template-columns: 0.5fr 1fr;
+    gap: 0px 0px; 
+    justify-content: center;
+    cursor: pointer;
+    grid-template-areas: 
+        "head tail"
+}
+
+.type-image {
+    grid-area: head;
     width: 100%;
-    aspect-ratio: 1;
-}
-
-.type-cpu .player-image {
-    grid-area: d;
-}
-
-.type-versus {
     height: 100%;
-    aspect-ratio: 1;
-    border: solid 1vw black;
-    border-radius: 10px;
-    background-color: white;
-    display: grid;
-    grid-template-areas:
-		"a b"
-        "c d";
+    background-repeat: no-repeat;
+    background-position: bottom;
 }
 
-.type-versus .player-image:nth-child(2) {
-    grid-area: d;
+.image-cpu {
+    background-image: url("../../assets/cpu.svg");
+    background-size: 90%;
 }
 
-.type-versus:hover {
-    cursor: pointer;
-    background-color: lightgray;
+.image-versus {
+    background-image: url("../../assets/versus.svg");
+    background-size: 60%;
+    background-position: 50% 40%;
 }
 
-.versus-label {
-    width: 25%;
-    vertical-align: middle;
-    text-align: center;
-    color: white;
-    text-shadow: 0 .1rem 0 rgba(0,0,0,.4);
-    font-family: "Montserrat",sans-serif;
-    font-weight: 700;
-    line-height: 1.6;
-    font-size: 2vw;
+.type-label {
+    grid-area: tail;
+    align-self: end;
+    margin: 10%;
+    font-family: var(--mainFont);
+    font-weight: 800;
+    color: #7baabc;
+    font-size: 3vw;
+    line-height: 1;
+    user-select: none;
 }
 
-.local-rounds {
-    width: 100%;
-    aspect-ratio: 32/3;
-    background-color: var(--mainColour);
-    padding-top: 2vw;
-    padding-left: 30%;
-    padding-right: 30%;
-    display: flex;
-    justify-content: space-evenly;
-}
-
-.round {
-    width: 20%;
-    aspect-ratio: 1;
-    border: 0.5vw solid black;
-    background-color: grey;
-    border-radius: 10px;
+.rounds {
+    grid-area: buttons;
+    display: grid; 
+    grid-auto-columns: 1fr; 
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 0px 0px; 
     justify-content: center;
-    text-align: center;
-    vertical-align: middle;
-    color: white;
-    text-shadow: 0 .1rem 0 rgba(0,0,0,.4);
-    font-family: "Montserrat",sans-serif;
-    font-weight: 700;
-    font-size: 4vw;
-    line-height: 1.7;
-    user-select: none; 
+    grid-template-areas: 
+        "one three five seven"
 }
 
-.round:hover {
+.round-button {
+    background-color: var(--mainAccentColour);
+    margin: 1vw;
+    width: 55%;
+    aspect-ratio: 1.8;
+    border-radius: 10px;
+    border-style: none;
+    box-shadow: 0 0.5vw 0 0 #7baabc;
+    --hoverColour: rgba(0,0,0,.2);
+    opacity: 0.5;
     cursor: pointer;
-    background-color: lightblue;
+    font-family: var(--mainFont);
+    font-weight: 800;
+    color: #7baabc;
+    font-size: 4.5vw;
+    text-align: center;
+    line-height: 150%;
+    user-select: none;
 }
 
-.round.selected {
-    background-color: lightgreen;
-}
-
-.local-start {
-    width: 100%;
-    aspect-ratio: 32/3;
-    background-color: var(--mainColour);
-    padding-top: 2vw;
-    padding-bottom: 2vw;
-    padding-left: 20%;
-    padding-right: 20%;
-    display: flex;
+.turns {
+    grid-area: buttons;
+    display: grid; 
+    grid-auto-columns: 1fr; 
+    grid-template-columns: 0.5fr 0.5fr 1fr;
+    gap: 0px 0px; 
     justify-content: center;
-    text-decoration: none;
+    grid-template-areas: 
+        "red white start-game"
 }
 
-.local-link {
+.turn-template {
+    background-color: var(--mainAccentColour);
+    margin: 1vw;
     width: 50%;
-    display: flex;
-    justify-content: center;
-    text-decoration: none;
+    aspect-ratio: 5;
+    border-radius: 10px;
+    border-style: none;
+    box-shadow: 0 0.5vw 0 0 #7baabc;
+    --hoverColour: rgba(0,0,0,.2);
+    opacity: 0.5;
+    cursor: pointer;
+    font-family: var(--mainFont);
+    font-weight: 800;
+    color: #7baabc;
+    font-size: 4.5vw;
+    text-align: center;
+    line-height: 150%;
+    user-select: none;
 }
 
-.btn-start-game {
-    appearance: none;
-    backface-visibility: hidden;
+.checker-format.turn {
+    transform: scale(0.75);
+    opacity: 0.9;
+}
+
+.local-start-button {
+    grid-area: start-game;
+    width: 60%;
+    height: 60%;
+    justify-self: center;
+    align-self: center;
     background-color: var(--attentionColour);
     border-radius: 10px;
     border-style: none;
     box-shadow: 0 0.5vw 0 0 var(--attentionColourLower) ,0 0.7vw .95vw .05vw var(--hoverColour);
     --hoverColour: rgba(0,0,0,.2);
-    box-sizing: border-box;
-    color: white;
+    color: var(--textColour);
+    text-shadow: var(--textShadow);
     cursor: pointer;
+    text-align: center;
     font-family: "Montserrat",sans-serif;
-    font-size: 2vw;
+    font-size: 3vw;
     font-weight: 700;
-    line-height: 2;
-    padding: 3% 20%;
-    white-space: nowrap;
-    text-decoration: none;
+    padding: 1vw 1vw;
+    line-height: 0.8;
 }
 
-.btn-start-game:hover {
-  background-color: var(--attentionColourHigher);
-  opacity: 1;
-}
-
-.btn-start-game:not([disabled]):hover {
-    --hoverColour: var(--attentionAccentColour);
+.highlight {
+    opacity: 1;
 }

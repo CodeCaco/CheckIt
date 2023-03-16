@@ -30,7 +30,7 @@ function CodedLobby(props) {
         </div>
         <div className={`coded-player p2 ${p2CurrentCSS}`}>
           <div className="coded-image"></div>
-          <div className="coded-label">{props.opponentJoin ? p2 : "Waiting for Player...."}</div>
+          <div className="coded-label">{props.opponentJoin ? p2 : <>Waiting for player<p className='create-dot'></p><p className='create-dot'></p><p className='create-dot'></p><p className='create-dot'></p></>}</div>
         </div>
         {props.opponentJoin ? props.isCreator ? <div className="coded-start" onClick={handleStartGame}>Start</div> : null : null}
       </div>

@@ -2,6 +2,7 @@ import React from 'react'
 import './OnlineMenu.css'
 import '../../App.css';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import PlayOnline from '../pages/PlayOnline';
 import  WaitingLobby from '../menus/online-menu/WaitingLobby'
 import  CodedLobby  from '../menus/online-menu/CodedLobby'
@@ -89,12 +90,17 @@ function OnlineMenu() {
       <WaitingLobby />
       :
       <div className="online-menu-background">
-        <div className="online-header">OnlineMenu</div>
+        <div className="online-toprow">
+          <Link to="/">
+            <button className='online-leave-button'></button>
+          </Link>
+          <div className="online-header">OnlineMenu</div>
+        </div>
         <div className="online-content-wrapper">
           <div className="online-content random-online">
             <div className="content-headpiece">Play Stranger</div>
             <div className="content-content">
-              <p className="content-text">You will be randomly paired with another player to start the game. <br />Get ready to show off your skills and see how well you fare against your new opponent!</p>
+              <p className="content-text">Get ready to show off your skills and see how well you fare against your new opponent!</p>
               <button className="content-button" onClick={() => {findGame()}}>Find</button>
             </div>
           </div>
@@ -102,7 +108,7 @@ function OnlineMenu() {
           <div className="online-content create-online">
             <div className="content-headpiece">Create Party</div>
             <div className="content-content">
-              <p className="content-text">You will receive a room code. <br /> Share room code with your friends and they can join the same game.</p>
+              <p className="content-text">Share room code with your friends and they can join the same game.</p>
               <button className="content-button" onClick={() => {createGame()}}>Create</button>
             </div>
           </div>

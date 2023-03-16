@@ -9,7 +9,7 @@ function WaitingLobby() {
 
   return (
     <div className='waited-background'>
-      <div className='waited-header'>Waiting for player....</div>
+      <div className='waited-header'>Waiting for player<p className='p-dot'></p><p className='p-dot'></p><p className='p-dot'></p><p className='p-dot'></p></div>
       <div className='leave-button' onClick={handleOnlineConnection}>Cancel</div>
     </div>
   )

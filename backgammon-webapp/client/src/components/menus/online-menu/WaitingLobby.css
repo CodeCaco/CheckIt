@@ -33,6 +33,37 @@
     grid-area: waiting;
 }
 
+.p-dot {
+  display: inline-block;
+  border-radius: 10%;
+  border: solid var(--textColour) 0.3vw;
+  margin: 0.5vw;
+  box-shadow: var(--textShadow);
+  margin-bottom: 0;
+}
+
+.p-dot:nth-child(1) {
+  animation: dot-animation .6s ease-in-out alternate infinite;
+}
+
+.p-dot:nth-child(2) {
+  animation: dot-animation .6s ease-in-out alternate .2s infinite;
+}
+
+.p-dot:nth-child(3) {
+  animation: dot-animation .6s ease-in-out alternate .4s infinite;
+}
+
+.p-dot:nth-child(4) {
+  animation: dot-animation .6s ease-in-out alternate .6s infinite;
+}
+
+@keyframes dot-animation {
+  100% {
+    transform: scale(1.5);
+  }
+}
+
 .leave-button {
     justify-self: center;
     width: 25vw;
@@ -62,4 +93,9 @@
   
   .leave-button:not([disabled]):hover {
     --hoverColour: var(--attentionAccentColour);
+  }
+
+  .leave-button:active {
+    box-shadow: 0 0.3vw 0 0 var(--attentionColourLower) ,0 0.5vw .75vw .03vw var(--hoverColour);
+    transform: translateY(4px);
   }

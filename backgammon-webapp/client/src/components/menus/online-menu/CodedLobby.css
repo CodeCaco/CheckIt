@@ -36,9 +36,14 @@
     opacity: 1;
   }
   
-  .coded-leave-lobby:not([disabled]):hover {
-    --hoverColour: var(--attentionAccentColour);
-  }
+.coded-leave-lobby:not([disabled]):hover {
+--hoverColour: var(--attentionAccentColour);
+}
+
+.coded-leave-lobby:active {
+box-shadow: 0 0.3vw 0 0 var(--attentionColourLower) ,0 0.5vw .75vw .03vw var(--hoverColour);
+transform: scaleX(-1) translateY(4px);
+}
 
 .coded-central {
     grid-area: center-content;
@@ -174,4 +179,39 @@
   
   .coded-start:not([disabled]):hover {
     --hoverColour: var(--attentionAccentColour);
+  }
+
+  .coded-start:active {
+    box-shadow: 0 0.3vw 0 0 var(--attentionColourLower) ,0 0.5vw .75vw .03vw var(--hoverColour);
+    transform: translateY(4px);
+  }
+
+  .create-dot {
+    display: inline-block;
+    border-radius: 10%;
+    border: solid var(--mainColour) 0.275vw;
+    margin: 0.5vw;
+    margin-bottom: 0;
+  }
+  
+  .create-dot:nth-child(1) {
+    animation: dot-animation .6s ease-in-out alternate infinite;
+  }
+  
+  .create-dot:nth-child(2) {
+    animation: dot-animation .6s ease-in-out alternate .2s infinite;
+  }
+  
+  .create-dot:nth-child(3) {
+    animation: dot-animation .6s ease-in-out alternate .4s infinite;
+  }
+  
+  .create-dot:nth-child(4) {
+    animation: dot-animation .6s ease-in-out alternate .6s infinite;
+  }
+  
+  @keyframes dot-animation {
+    100% {
+      transform: scale(1.5);
+    }
   }
