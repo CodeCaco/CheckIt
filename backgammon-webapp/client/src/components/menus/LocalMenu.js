@@ -110,7 +110,9 @@ function LocalMenu() {
                     <div className={`turn-template ${white}`} onClick={() => {setTurns(2)}}>
                         <div className="checker-format checker-white turn"></div>
                     </div>
-                    <button className='local-start-button'>Start</button>
+                    <Link to="/localPlay">
+                        <button className='local-start-button'>Start</button>
+                    </Link>
                 </div>
             </div>
         </div>

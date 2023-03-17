@@ -38,7 +38,7 @@ class Play extends Component {
     const boxes = Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15}))
 
     boxes[0].checkers = 0
-    boxes[1].checkers = 0  
+    boxes[1].checkers = 0 
 
     this.setState({
       dice: [],
@@ -70,6 +70,7 @@ class Play extends Component {
       }
     }
 
+    dice = [3, 1]
     dice.sort((a, b) => b - a)
     let pips = this.cleanPips(this.state.pips)
     let boxes = this.cleanBoxes(this.state.boxes)
@@ -108,8 +109,14 @@ class Play extends Component {
       if (firstCheckerIndex !== false) {
         playerPips = pips.filter((p, i) => i === firstCheckerIndex)
       } else {
-        // find all the pips that have p1 checkers
-        playerPips = pips.filter(pip => pip.player === 1)
+
+        const prime = this.checkPrime(boxes, pips, pipPath)
+        if (prime.primeExists) {
+          playerPips = prime.primePips
+        } else {
+           // find all the pips that have p1 checkers
+          playerPips = pips.filter(pip => pip.player === 1)
+        }
       }
     } else {
       // this array is responsible for the pip path each player follows
@@ -141,9 +148,11 @@ class Play extends Component {
         // check that the destination pip doesn't loop path
         const remainingPath = (pipPath.length - 1) - pathOriginIndex
         if (die <= remainingPath) {
-          // check that the destination pip doesn't have enemy player checkers
-          if (pips[destinationPip].player === pips[originIndex].player || pips[destinationPip].player === null) {
-            numberOfPossibleDestinations++
+          if (!this.checkInitialPrime(originIndex, destinationPip, pips)) {
+            // check that the destination pip doesn't have enemy player checkers
+            if (pips[destinationPip].player === pips[originIndex].player || pips[destinationPip].player === null) {
+              numberOfPossibleDestinations++
+            }
           }
         }
       })
@@ -193,9 +202,11 @@ class Play extends Component {
         // check that the destination pip doesn't loop path
         const remainingPath = (pipPath.length - 1) - pathOriginIndex
         if (die <= remainingPath) {
-          // check that the destination pip doesn't have enemy player checkers
-          if (pips[receivingPip].player === pips[checker].player || pips[receivingPip].player === null) {
-            possibleDestinations.push({index: receivingPip, die: die})
+          if (!this.checkInitialPrime(originIndex, receivingPip, pips)) {
+            // check that the destination pip doesn't have enemy player checkers
+            if (pips[receivingPip].player === pips[checker].player || pips[receivingPip].player === null) {
+              possibleDestinations.push({index: receivingPip, die: die})
+            }
           }
         }
       });
@@ -327,6 +338,65 @@ class Play extends Component {
         p2FirstChecker: firstCheckerIndex
       })
       }
+  }
+
+  checkPrime = (boxes, pips, pipPath) => {
+    const player = this.state.player1 ? 2 : 1
+    const numberOfCheckersInBoard = 15 - boxes[player - 1].checkers
+    
+    let fullPip = false
+    for (let i = 0; i < pips.length; i++) {
+      const checkers = pips[i].checkers
+      const checkerPlayer = pips[i].player
+   
+      if ((checkers === numberOfCheckersInBoard) && (checkerPlayer === player)) {
+        fullPip = i
+        break
+      }
+    }
+
+    let primeExists = false
+    const primePips = []
+
+    if (fullPip) {
+      const player = this.state.player1 ? 1 : 2
+      const pathOriginIndex = pipPath.findIndex(p => p === fullPip)
+
+      primeExists = true
+      for (let i = 1; i < 7; i++) {
+        const index = pipPath[(i + pathOriginIndex) % 24]
+        if ((pips[index].checkers === 0) || (pips[index].player !== player)) {
+          primeExists = false
+          break
+        }
+        primePips.push(pips[index])
+      }
+    }
+    return {primeExists: primeExists, primePips: primePips}
+  }
+
+  // function responsible for checking if there is a prime present in the initial tables
+  checkInitialPrime = (originIndex, destinationIndex, pips) => {
+    const initTable = this.state.player1 ? [12,13,14,15,16,17] : [6,7,8,9,10,11]
+    const player = this.state.player1 ? 1 : 2
+
+    let primeExists = false
+    if (initTable.includes(destinationIndex)) {
+      if (pips[destinationIndex].checkers === 0) {
+        if (pips[originIndex].checkers > 1) {
+          primeExists = true
+          const rI = initTable.indexOf(destinationIndex); // find the index of the element
+          initTable.splice(rI, 1);
+
+          initTable.forEach((index) => {
+            if ((pips[index].checkers === 0) || (pips[index].player !== player)) {
+              primeExists = false
+            }
+          })
+        }
+      }
+    }
+    return primeExists
   }
 
   // function that iterates through the last table and sees if user has all the checkers in it meaning it can start bearing off pieces
