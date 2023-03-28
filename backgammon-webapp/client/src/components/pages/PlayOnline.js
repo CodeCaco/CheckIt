@@ -16,16 +16,34 @@ class PlayOnline extends Component {
     this.isRandom = props.isRandom
     this.socket = socket
 
+    if (props.isCreator) {
+      this.p1 = "You" 
+      this.p2 = props.opponent
+    } else {
+      this.p1 = props.opponent 
+      this.p2 = "You"
+    }
+
+    const pips = Array(24).fill({player: null, checkers: 0})
+
+    pips[12] = {player: 1, checkers: 15}
+    pips[11] = {player: 2, checkers: 15}
+
+    const boxes = Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15}))
+
+    boxes[0].checkers = 0
+    boxes[1].checkers = 0
+
     this.state = {
       dice: [],
       player1: true,
       p1FirstChecker: 12,
       p2FirstChecker: 11,
       moving: false,
-      pips: Array(24).fill({player: null, checkers: 0}),
+      pips: pips,
       p1Path: [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
       p2Path: [11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-      boxes: Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15})),
+      boxes: boxes,
       redWP: 50,
       redWPHistory: [],
       finalTable: null,
@@ -146,16 +164,34 @@ class PlayOnline extends Component {
     })
   }
 
+  handleResign = () => {
+    window.location.reload()
+  }
+
   render() {
   return (
-      <>
-        <div className="progress">
-          <ProgressBar redWP={this.state.redWP}></ProgressBar>
-        </div>
-        <div className="playground">
+    <>
+        <div className="play-layout">
           {this.state.finalTable}
           {this.state.noMoves}
-          <Board state={this.state} player1={this.state.player1} rollDice={this.calculateRoll} dice={this.state.dice}/>
+          <div className="profile1">
+            <div className="profile-picture p1"></div>
+            <div className="profile-score">{this.p1}</div>
+          </div>
+          <div className="board-wrapper">
+            Random Game
+            <div className="progress">
+              <ProgressBar redWP={this.state.redWP}></ProgressBar>
+            </div>
+            <div className="playground">
+              <Board state={this.state} player1={this.state.player1} rollDice={this.calculateRoll} dice={this.state.dice}/>
+            </div>
+          </div>
+          <div className="profile2">
+            <div className="profile-picture p2"></div>
+            <div className="profile-score">{this.p2}</div>
+          </div>
+          <button className="resign-button" onClick={this.handleResign}></button>
         </div>
       </>
     );

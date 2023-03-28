@@ -23,9 +23,13 @@ function OnlineMenu() {
   const [isRandom, setIsRandom] = useState(true) 
   const [isCreator, setIsCreator] = useState(false)
   const [opponentJoin, setOpponentJoin] = useState(false)
+  const [first, setFirst] = useState(false)
   const opponent = generateRandomGreekName()
   
-  socket.on('game-start', () => {
+  socket.on('game-start', (creator) => {
+    if (socket.id === creator) {
+      setFirst(true)
+    }
     setWaitingPlayer(false)
   })
 
@@ -122,7 +126,7 @@ function OnlineMenu() {
           </div>
         </div>
       </div>
-      : <PlayOnline isRandom={isRandom}/>
+      : <PlayOnline isCreator={first} opponent={opponent} isRandom={isRandom}/>
       }
     </>
   )
