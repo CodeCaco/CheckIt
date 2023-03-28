@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import '../../App.css';
 import './LocalMenu.css'
+import Play from '../pages/Play';
 
 function LocalMenu() {
     let [cpu, versus] = [null, null]
@@ -12,6 +13,8 @@ function LocalMenu() {
     const [type, setType] = useState(1)
     const [rounds, setRounds] = useState(1)
     const [turns, setTurns] = useState(1)
+
+    const [start, setStart] = useState(false)
 
     switch (type) {
         case 1:
@@ -72,9 +75,14 @@ function LocalMenu() {
             red = "highlight"
             white = null
     }
+
+    function handleStartGame() {
+        setStart(true)
+    }
  
     return (
     <>
+        { !start ?
         <div className="local-wrapper">
             <Link to="/">
                 <button className='local-leave-button'></button>
@@ -110,12 +118,13 @@ function LocalMenu() {
                     <div className={`turn-template ${white}`} onClick={() => {setTurns(2)}}>
                         <div className="checker-format checker-white turn"></div>
                     </div>
-                    <Link to="/localPlay">
-                        <button className='local-start-button'>Start</button>
-                    </Link>
+                    <button className='local-start-button' onClick={handleStartGame}>Start</button>
                 </div>
             </div>
         </div>
+        :
+        <Play type={type} rounds={rounds} turns={turns}/>
+        }
     </>
   );
 }

@@ -1,7 +1,8 @@
 .white-bar {
-    width: 100%;
-    aspect-ratio: 32;
+    width: 80%;
+    height: 100%;
     background-color: white;
+    border-radius: 10px;
 }
 
 .red-bar {
@@ -9,4 +10,5 @@
     height: 100%;
     background-color: #e80000;
     transition: width 1s ease-in-out;
+    border-radius: 10px;
 }

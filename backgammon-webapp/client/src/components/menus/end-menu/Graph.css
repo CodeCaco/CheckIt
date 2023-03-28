@@ -2,12 +2,8 @@
     --color: #e80000
 }
 
-.caption {
-    font-size: 2vw;
-}
-
 .graph-area {
     background-color: white!important;
-    border: 5px solid black;
+    border: 5px solid var(--mainColour);
     border-radius: 10px;
 }

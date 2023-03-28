@@ -10,13 +10,19 @@
 
 .counter {
     position: absolute;
-    margin: -15px;
+    margin: -2vw;
+    font-family: var(--mainFont);
+    font-weight: 800;
+    color: var(--mainColour);
     font-size: 1.5vw;
+    line-height: 1;
+    user-select: none;
+    text-shadow: none;
 }
 
 .bottom.counter{
     bottom: 0;
-    margin: -15px;
+    margin: -2vw;
 }
 
 .box-middle {
@@ -27,7 +33,7 @@
     border-top: 25px;
     border-bottom: 25px;
     border-image: url("../../../../assets/leather.jpeg") 10% 30% / 20px 10px / 10px;
-    box-shadow: 3px 15px 15px 3px rgb(31, 31, 31) inset;
+    box-shadow: 3px 3px 5px 3px rgba(31, 31, 31, 0.356) inset;
     background-image: url("../../../../assets/cloth.jpg");
     align-items: center;
     justify-content: center;
@@ -42,7 +48,7 @@
     width: 100%;
     display: grid; 
     grid-template-rows: repeat(15, 1fr);
-    box-shadow: 3px 15px 5px 3px rgba(31, 31, 31, 0.356) inset;
+    box-shadow: 3px 3px 5px 3px rgba(31, 31, 31, 0.356) inset;
     transform: scaleY(-1);
 }
 

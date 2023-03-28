@@ -11,10 +11,29 @@ import { NoMoves } from '../board/outside/dice/NoMoves';
 class Play extends Component {
   constructor(props) {
     super(props);
-    
+    console.log(props)
+    this.type = props.type === 1 ? "AI" : "Versus"
+    this.rounds = props.rounds
+    if (this.type === "AI") {
+      if (props.turns === 1) {
+        this.p1 = ""
+        this.p2 = "ai-picture"
+      } else {
+        this.p1 = "ai-picture"
+        this.p2 = ""
+      }
+      this.turns = Math.random() < 0.5 ? true : false
+      this.AIplayer = props.turns === 1 ? false : true
+    } else {
+      this.turns = props.turns === 1 ? true : false
+    }
+  
     this.state = {
+      aiPlayer: this.AIplayer,
       dice: [],
-      player1: true,
+      player1: this.turns,
+      p1score: 0,
+      p2score: 0,
       p1FirstChecker: 12,
       p2FirstChecker: 11,
       moving: false,
@@ -29,6 +48,17 @@ class Play extends Component {
     }
   }
 
+  componentDidMount = async () => {
+    await this.newGameSetup()
+    if (this.type === "AI") {
+      console.log("estmaos ins")
+      if (this.state.aiPlayer === this.state.player1) {
+        console.log("AIplayer: ", this.state.aiPlayer)
+        this.randomMovesAI(this.state.pips, this.state.boxes, this.state.player1)
+      }
+    }
+  }
+
   newGameSetup = () => {
     const pips = Array(24).fill({player: null, checkers: 0})
 
@@ -38,11 +68,11 @@ class Play extends Component {
     const boxes = Array(2).fill().map((_, i) => ({player: i + 1, checkers: 15}))
 
     boxes[0].checkers = 0
-    boxes[1].checkers = 0 
+    boxes[1].checkers = 0
 
     this.setState({
       dice: [],
-      player1: true,
+      player1: this.turns,
       p1FirstChecker: 12,
       p2FirstChecker: 11,
       moving: false,
@@ -52,6 +82,243 @@ class Play extends Component {
       redWPHistory: [],
       finalTable: null
     })
+  }
+
+  randomMovesAI = async (pips, boxes, player) => {
+    console.log(player)
+    await new Promise(resolve => setTimeout(resolve, 600));
+    let dice = [];
+
+    // finds 2 random numbers between 1-6 and adds them to dice => simulating roll of 2 dices
+    for (let i = 0; i < 2; i++) {
+      dice.push(Math.floor(Math.random() * 6) +1)
+    }
+
+    // if both die rolls are the same, then double it (FEVGA rule)
+    if (dice[0] === dice[1]) {
+      for (let i = 0; i < 2; i++) {
+        dice.push(dice[0])
+      }
+    }
+
+    let finalPips = this.cleanPips(pips)
+    let finalBoxes = this.cleanBoxes(boxes)
+
+    let firstCheckerIndex = player ? this.state.p1FirstChecker : this.state.p2FirstChecker
+
+    this.setState({
+      dice: dice
+    }, async () => {
+      const nonBoardDice = [...dice]
+      // iterate through the dice in order to compute 1 move at a time
+      for (const die of nonBoardDice) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        let pips = this.cleanPips(finalPips)
+        let boxes = this.cleanBoxes(finalBoxes)
+
+        // change when doing different players
+        const pipPath = player ? this.state.p1Path : this.state.p2Path
+        const moves = this.findMovesAI(pips, die, firstCheckerIndex, boxes, player, pipPath)
+
+        if ("noMoves" in moves) {
+          continue
+        }
+
+        const bearingMoves = []
+        const normalMoves = []
+        
+        moves.moves.forEach((move) => {
+          if (move.isPip) {
+            normalMoves.push(move)
+          } else {
+            bearingMoves.push(move)
+          }
+        })
+        
+        let move = null
+
+        if (bearingMoves.length !== 0) {
+          const moveIndex = Math.floor(Math.random() * bearingMoves.length)
+          move = bearingMoves[moveIndex]
+        } else if (normalMoves.length !== 0) {
+          const moveIndex = Math.floor(Math.random() * normalMoves.length)
+          move = normalMoves[moveIndex]
+        } 
+      
+        const originIndex = move.originIndex
+        const destinationIndex = move.destinationIndex
+
+        // remove checker from the origin pip
+        finalPips[originIndex].checkers--
+
+        // if the origin pip is empty after removal, make it non player occupied
+        if (finalPips[originIndex].checkers === 0) {
+          finalPips[originIndex].player = null
+        }
+
+        const playerNumber = player ? 1 : 2
+
+        // if index is null, then checker is bearing off thus adding incrementing the checkers in checker box
+        if (!move.isPip) {
+          finalBoxes[playerNumber - 1].checkers++
+          // check if game has ended by having 15 checkers in the checker box
+          if (finalBoxes[playerNumber - 1].checkers === 15) {
+              console.log("Game Ended")
+              const score = playerNumber === 1 ? this.state.p1score : this.state.p2score
+              if (score + 1 === this.rounds) {
+                if (playerNumber === 1) {
+                  this.setState({
+                    p1score: this.state.p1score + 1
+                  })
+                } else {
+                  this.setState({
+                    p2score: this.state.p2score + 1
+                  })
+                }
+                this.renderEndMenu(this.state.player1)
+                return
+              } else {
+                if (playerNumber === 1) {
+                  this.setState({
+                    p1score: this.state.p1score + 1
+                  })
+                } else {
+                  this.setState({
+                    p2score: this.state.p2score + 1
+                  })
+                }
+                this.newGameSetup()
+                return
+              }
+            }
+        } else {
+          // add a checker to the destination pip & update the pip's player occupation to that of the checker owner
+          finalPips[destinationIndex].checkers++
+          finalPips[destinationIndex].player = playerNumber
+
+          // update the state of the first checker depending on whether or not it crossed to the opposing table
+          if (player) {
+            if (firstCheckerIndex !== false) {
+              if (destinationIndex < 24 && destinationIndex > 11) {
+                firstCheckerIndex = destinationIndex
+              } else {
+                firstCheckerIndex = false
+              }
+            }
+          } else {
+            if (firstCheckerIndex !== false) {
+              if (destinationIndex < 12) {
+                firstCheckerIndex = destinationIndex
+              } else {
+                firstCheckerIndex = false
+              }
+            }
+          }
+        }
+
+        // after move is done, remove the die responsible for said move
+        const dieIndex = dice.findIndex(d => d === die)
+        dice.splice(dieIndex, 1)
+
+        const redWP = this.calculateRedWP(finalPips)
+        this.state.redWPHistory.push(redWP)
+
+        this.setState({
+          dice: dice,
+          pips: finalPips,
+          boxes: finalBoxes,
+          redWP: redWP
+        })
+      }
+      this.setState({
+        dice: [],
+        player1: !player,
+        pips: finalPips,
+        boxes: finalBoxes
+      })
+      
+      if (player) {
+        this.setState({
+          p1FirstChecker: firstCheckerIndex
+        })
+      } else {
+        this.setState({
+          p2FirstChecker: firstCheckerIndex
+        })
+      }
+    })
+  }
+
+  // // function that handles the highlighting of all checkers that are allows to move
+  findMovesAI = (pips, die, firstCheckerIndex, boxes, player, pipPath) => {
+    let playerPips = []
+    let possibleDestinations = []
+
+    // for both players specify it's path and which pips have checkers that are allowed to move
+    if (player) {
+      // if the first checker still hasn't moved from starting table, only find the pip of that first checker
+      if (firstCheckerIndex !== false) {
+        playerPips = pips.filter((p, i) => i === firstCheckerIndex)
+      } else {
+
+        const prime = this.checkPrime(boxes, pips, pipPath)
+        if (prime.primeExists) {
+          playerPips = prime.primePips
+        } else {
+           // find all the pips that have p1 checkers
+          playerPips = pips.filter(pip => pip.player === 1)
+        }
+      }
+    } else {
+      // if the first checker still hasn't moved from starting table, only find the pip of that first checker
+      if (firstCheckerIndex !== false) {
+        playerPips = pips.filter((p, i) => i === firstCheckerIndex)
+      } else {
+        // find all the pips that have p1 checkers
+        playerPips = pips.filter(pip => pip.player === 2)
+      }
+    }
+
+    let foundMoves = false
+
+    // for each pip find the ones that have movable checkers
+    playerPips.forEach((pip) => {
+      const originIndex = pips.findIndex(p => p === pip)
+      const pathOriginIndex = pipPath.findIndex(p => p === originIndex)
+
+      // calculate the destination index to get pip from the pipPath
+      let destinationIndex = (pathOriginIndex + die) % 24
+      let destinationPip = pipPath[destinationIndex]
+  
+      // check that the destination pip doesn't loop path
+      const remainingPath = (pipPath.length - 1) - pathOriginIndex
+      if (die <= remainingPath) {
+        if (!this.checkInitialPrime(originIndex, destinationPip, pips)) {
+          // check that the destination pip doesn't have enemy player checkers
+          if (pips[destinationPip].player === pips[originIndex].player || pips[destinationPip].player === null) {
+            possibleDestinations.push({originIndex: originIndex, destinationIndex: destinationPip, isPip: true})
+          }
+        }
+      }
+
+      // check if checker is in a bearable position
+      if(this.handleBearing(pips, pathOriginIndex, [die], pipPath, boxes).canBearOff) {
+        const boxIndex = player ? 0 : 1
+        possibleDestinations.push({originIndex: originIndex, destinationIndex: boxIndex, isPip: false})
+      }
+
+      // if there are possible destinations then mark that checker has movable
+      if (possibleDestinations.length > 0) {
+        foundMoves = true
+      }
+    });
+
+    // check if there are not more moves available
+    if (!foundMoves) {
+      return {moves: possibleDestinations, noMoves: true}
+    }
+    return {moves: possibleDestinations}
   }
 
   // function responsible for handling the roll of the dice
@@ -70,7 +337,6 @@ class Play extends Component {
       }
     }
 
-    dice = [3, 1]
     dice.sort((a, b) => b - a)
     let pips = this.cleanPips(this.state.pips)
     let boxes = this.cleanBoxes(this.state.boxes)
@@ -285,8 +551,32 @@ class Play extends Component {
       // check if game has ended by having 15 checkers in the checker box
       if (boxes[player - 1].checkers === 15) {
         console.log("Game Ended")
-        this.renderEndMenu(this.state.player1)
-        return
+        const score = player === 1 ? this.state.p1score : this.state.p2score
+        if (score + 1 === this.rounds) {
+          if (player === 1) {
+            this.setState({
+              p1score: this.state.p1score + 1
+            })
+          } else {
+            this.setState({
+              p2score: this.state.p2score + 1
+            })
+          }
+          this.renderEndMenu(this.state.player1)
+          return
+        } else {
+          if (player === 1) {
+            this.setState({
+              p1score: this.state.p1score + 1
+            })
+          } else {
+            this.setState({
+              p2score: this.state.p2score + 1
+            })
+          }
+          this.newGameSetup()
+          return
+        }
       }
     } else {
       // add a checker to the destination pip & update the pip's player occupation to that of the checker owner
@@ -337,7 +627,12 @@ class Play extends Component {
       this.setState({
         p2FirstChecker: firstCheckerIndex
       })
-      }
+    }
+    
+    if ((player !== this.state.player1) && (this.type === "AI")) {
+      console.log("AI Turn")
+      this.randomMovesAI(pips, boxes, player)
+    }
   }
 
   checkPrime = (boxes, pips, pipPath) => {
@@ -623,29 +918,42 @@ class Play extends Component {
 
   renderEndMenu = (winner) => {
     const winnerString = winner ? "Player 1" : "Player 2"
-    const height = document.getElementsByClassName("progress")[0].clientHeight + document.getElementsByClassName("playground")[0].clientHeight
-    const width = window.innerWidth
-    const table = (<EndMenu height={height} winnerString={winnerString} width={width} data={this.state.redWPHistory}/>)
+    const table = (<EndMenu winnerString={winnerString} data={this.state.redWPHistory}/>)
 
   this.setState({
     finalTable: table
   })
   }
 
+  handleResign = () => {
+    window.location.reload()
+  }
+
   render() {
   return (
       <>
-        <div className="progress">
-          <ProgressBar redWP={this.state.redWP}></ProgressBar>
-        </div>
-        <div className="playground">
+        <div className="play-layout">
           {this.state.finalTable}
           {this.state.noMoves}
-          <Board state={this.state} player1={this.state.player1} rollDice={this.calculateRoll} dice={this.state.dice}/>
+          <div className="profile1">
+            <div className={`profile-picture p1 ${this.p1}`}></div>
+            <div className="profile-score">Score: {this.state.p1score}</div>
+          </div>
+          <div className="board-wrapper">
+            Game {this.state.p1score + this.state.p2score + 1}:
+            <div className="progress">
+              <ProgressBar redWP={this.state.redWP}></ProgressBar>
+            </div>
+            <div className="playground">
+              <Board state={this.state} player1={this.state.player1} rollDice={this.calculateRoll} dice={this.state.dice}/>
+            </div>
+          </div>
+          <div className="profile2">
+            <div className={`profile-picture p2 ${this.p2}`}></div>
+            <div className="profile-score">Score: {this.state.p2score}</div>
+          </div>
+          <button className="resign-button" onClick={this.handleResign}></button>
         </div>
-        <button onClick={this.clearDice}>clear</button>
-        <button onClick={this.newGameSetup}>start</button>
-        <button onClick={() => this.renderEndMenu(this.state.player1)}>test</button>
       </>
     );
 }
