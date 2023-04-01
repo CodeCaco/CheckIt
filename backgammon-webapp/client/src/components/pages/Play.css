@@ -95,20 +95,40 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    /* transform: rotate(180deg); */
 }
 
-/* .playground .counter {
+.play-layout.invert {
+    display: grid; 
+    grid-auto-columns: 1fr; 
+    grid-template-columns: 0.2fr 1fr 0.2fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0px 0px; 
+    justify-content: center;
+    background-color: var(--textSecondaryColour);
+    grid-template-areas: 
+        "profile2 board profile1"
+        "resign board ."
+}
+
+.playground.invert {
+    transform: rotate(180deg);
+}
+
+.progress.invert {
+    transform: rotate(180deg);
+}
+
+.invert .counter {
     transform: rotate(-180deg); 
 }
 
-.playground .btn-dice {
-    transform: rotate(-180deg); 
+.invert .btn-dice {
+    transform: rotateY(-180deg) rotate(-180deg); 
 }
 
-.playground .checker-format {
+.invert .checker-format {
     transform: rotate(-180deg); 
-} */
+}
 
 .progress {
     width: 100%;

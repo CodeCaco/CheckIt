@@ -16,10 +16,15 @@ class PlayOnline extends Component {
     this.isRandom = props.isRandom
     this.socket = socket
 
+    this.invert = ""
+
+    this.gameTitle = this.isRandom === true ? "Random Game" : this.isRandom
+
     if (props.isCreator) {
       this.p1 = "You" 
       this.p2 = props.opponent
     } else {
+      this.invert = "invert"
       this.p1 = props.opponent 
       this.p2 = "You"
     }
@@ -171,24 +176,24 @@ class PlayOnline extends Component {
   render() {
   return (
     <>
-        <div className="play-layout">
+        <div className={`play-layout ${this.invert}`}>
           {this.state.finalTable}
           {this.state.noMoves}
           <div className="profile1">
-            <div className="profile-picture p1"></div>
+            <div className={`profile-picture p1 ${this.p1}`}></div>
             <div className="profile-score">{this.p1}</div>
           </div>
           <div className="board-wrapper">
-            Random Game
-            <div className="progress">
+            {this.gameTitle}
+            <div className={`progress ${this.invert}`}>
               <ProgressBar redWP={this.state.redWP}></ProgressBar>
             </div>
-            <div className="playground">
+            <div className={`playground ${this.invert}`}>
               <Board state={this.state} player1={this.state.player1} rollDice={this.calculateRoll} dice={this.state.dice}/>
             </div>
           </div>
           <div className="profile2">
-            <div className="profile-picture p2"></div>
+            <div className={`profile-picture p2 ${this.p2}`}></div>
             <div className="profile-score">{this.p2}</div>
           </div>
           <button className="resign-button" onClick={this.handleResign}></button>

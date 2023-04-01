@@ -98,7 +98,7 @@ function OnlineMenu() {
           <Link to="/">
             <button className='online-leave-button'></button>
           </Link>
-          <div className="online-header">OnlineMenu</div>
+          <div className="online-header">Online Menu</div>
         </div>
         <div className="online-content-wrapper">
           <div className="online-content random-online">
@@ -119,7 +119,7 @@ function OnlineMenu() {
           <div className="online-content join-online">
             <div className="content-headpiece">Join Party</div>
             <div className="content-content join-room">
-              <p className="enter-code">Enter Room Code:</p>
+              <p className="enter-code">Enter Room Code</p>
               <input className="code-input" type="text" value={code} onChange={handleInputChange} placeholder="Room Code:"/>
               <button className="content-button" onClick={() => {joinGame()}}>Join</button>
             </div>

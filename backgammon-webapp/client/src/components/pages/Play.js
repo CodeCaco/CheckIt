@@ -14,11 +14,14 @@ class Play extends Component {
     console.log(props)
     this.type = props.type === 1 ? "AI" : "Versus"
     this.rounds = props.rounds
+
+    this.invert = ""
     if (this.type === "AI") {
       if (props.turns === 1) {
         this.p1 = ""
         this.p2 = "ai-picture"
       } else {
+        this.invert = "invert"
         this.p1 = "ai-picture"
         this.p2 = ""
       }
@@ -932,7 +935,7 @@ class Play extends Component {
   render() {
   return (
       <>
-        <div className="play-layout">
+        <div className={`play-layout ${this.invert}`}>
           {this.state.finalTable}
           {this.state.noMoves}
           <div className="profile1">
@@ -941,10 +944,10 @@ class Play extends Component {
           </div>
           <div className="board-wrapper">
             Game {this.state.p1score + this.state.p2score + 1}:
-            <div className="progress">
+            <div className={`progress ${this.invert}`}>
               <ProgressBar redWP={this.state.redWP}></ProgressBar>
             </div>
-            <div className="playground">
+            <div className={`playground ${this.invert}`}>
               <Board state={this.state} player1={this.state.player1} rollDice={this.calculateRoll} dice={this.state.dice}/>
             </div>
           </div>
