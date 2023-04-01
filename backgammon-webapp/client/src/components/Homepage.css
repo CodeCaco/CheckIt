@@ -96,6 +96,11 @@
   --hoverColour: var(--attentionAccentColour);
 }
 
+.hero-button:active {
+  box-shadow: 0 0.3vw 0 0 var(--attentionColourLower) ,0 0.5vw .75vw .03vw var(--hoverColour);
+  transform: translateY(4px);
+}
+
 .local-image {
   width: 30%;
   aspect-ratio: 1;

@@ -35,16 +35,29 @@
     background: url('../../../../assets/close.svg') no-repeat;
     background-position: center;
     cursor: pointer;
-    width: 4vw;
-    height: 4vw;
-    background-size: 4vw;
-    border: none;
+    width: 3vw;
+    height: 3vw;
+    background-size: 3vw;
+    background-color: var(--attentionColour);
+    box-shadow: 0 0.5vw 0 0 var(--attentionColourLower) ,0 0.7vw .95vw .05vw var(--hoverColour);
+    --hoverColour: rgba(0,0,0,.2);
     grid-area: close-button;
+    border: none;
+    border-radius: 10px;
 }
 
 .close-no-moves:hover {
-    background-image: url('../../../../assets/close.svg');
-    filter: brightness(130%);
+    background-image: url('../../../../assets/close_hover.svg');
+    background-color: var(--attentionColourHigher);
+}
+
+.close-no-moves:not([disabled]):hover {
+    --hoverColour: var(--attentionAccentColour);
+}
+
+.close-no-moves:active {
+    box-shadow: 0 0.3vw 0 0 var(--attentionColourLower) ,0 0.5vw .75vw .03vw var(--hoverColour);
+    transform: translateY(4px);
 }
 
 .header-no-moves {

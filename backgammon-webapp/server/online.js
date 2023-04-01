@@ -37,9 +37,12 @@ class Game {
         boxes[0].checkers = 0
         boxes[1].checkers = 0
 
+        const start = Math.random() < 0.5 ? true : false
+        console.log(start)
+
         this.state = {
             dice: [],
-            player1: true,
+            player1: start,
             p1FirstChecker: 12,
             p2FirstChecker: 11,
             moving: false,
@@ -546,11 +549,12 @@ const gameInit = (sio, ssocket) => {
 /*            Game Logic             */
 /* --------------------------------- */
 
-function gameStart(socketID, isRandom) {
+async function gameStart(socketID, isRandom) {
     const {game, room} = findGameAndRoom(socketID, isRandom)
     const roomName = "room-" + room.id
 
     game.newGameSetup()
+    await new Promise(resolve => setTimeout(resolve, 100));
     io.to(roomName).emit("update-state", JSON.stringify(game.state))
 }
 
@@ -678,7 +682,7 @@ function findGame() {
         this.join(`room-${room.id}`)
         console.log(`Player ${this.id} joined room ${room.id}`);
 
-        io.to(`room-${room.id}`).emit("game-start")
+        io.to(`room-${room.id}`).emit("game-start", room.creator)
         gameStart(this.id, true)
     } else {
         // Create a new room and join it
@@ -727,7 +731,7 @@ function joinGame(code) {
 
 function startGame() {
     const room  = codedSessions.find(room => room.players.includes(this.id));
-    io.to(`room-${room.id}`).emit("game-start")
+    io.to(`room-${room.id}`).emit("game-start", room.creator)
     gameStart(this.id, room.code)
 }
 
